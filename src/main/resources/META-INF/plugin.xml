@@ -1,0 +1,30 @@
+<idea-plugin>
+    <id>spring.web.initializr.plugin</id>
+    <name>Spring Web Initializr</name>
+    <vendor email="orestes.polyzos@gmail.com" url="https://www.linkedin.com/in/orestes-polyzos/">Orestes Polyzos</vendor>
+
+    <idea-version since-build="145.20" until-build="191.*"/>
+
+    <description>
+        <![CDATA[
+            Some description should be placed here about the purpose of the plugin.
+        ]]>
+    </description>
+
+    <change-notes>
+        <![CDATA[
+            Release notes should go here about the current version and the previous ones.
+        ]]>
+    </change-notes>
+
+    <actions>
+        <group id="spring-web-initializr-group" text="Spring Web Initializr" popup="true">
+            <add-to-group group-id="EditorPopupMenu" anchor="first"/>
+        </group>
+        <action id="freemarkerAction" class="ore.plugins.idea.spring.web.initializr.action.FreemarkerAction"
+                text="Freemarker"
+                description="Generates Freemarker resources">
+            <add-to-group group-id="spring-web-initializr-group" anchor="first"/>
+        </action>
+    </actions>
+</idea-plugin>

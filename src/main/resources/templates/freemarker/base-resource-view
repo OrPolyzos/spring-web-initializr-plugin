@@ -1,0 +1,22 @@
+<#import "/spring.ftl" as spring/>
+<html>
+<head>
+    <title>${baseResourceViewTitle}</title>
+    <#include "common/head-section.ftl"/>
+</head>
+<body>
+<h1 class="infoMessage">${infoMessage!""}</h1>
+<h1 class="errorMessage">${errorMessage!""}</h1>
+<div class="container-fluid">
+    <div class="row">
+        <#include "section/${createResourceViewSection}"/>
+    </div>
+    <hr/>
+    <div class="row">
+        <#include "section/${searchResourceViewSection}"/>
+    </div>
+</div>
+<#include "section/${tableResourceViewSection}"/>
+<#include "common/scripts-section.ftl"/>
+</body>
+</html>

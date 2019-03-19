@@ -1,0 +1,29 @@
+<#import "/spring.ftl" as spring/>
+<html>
+<head>
+    <title>${editResourceViewTitle}</title>
+    <#include "common/head-section.ftl"/>
+</head>
+<body>
+<h1 class="infoMessage">${infoMessage!""}</h1>
+<h1 class="errorMessage">${errorMessage!""}</h1>
+<div class="container">
+    <div class="row">
+        <div class="col-md-12">
+            <form class="form-horizontal" action="${editResourcePostUri}" method="POST" id="${resourceFormHolder}" name="${resourceFormHolder}">
+                <div class="col-md-12 controls">
+                ${editResourceViewEditForm}
+                </div>
+                    <span>
+                        <button type="submit" class="btn btn-success">Save</button>
+                        <button type="reset" class="btn btn-danger">Clear</button>
+                    </span>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+<#include "common/scripts-section.ftl"/>
+</body>
+</html>
+

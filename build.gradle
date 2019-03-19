@@ -1,0 +1,55 @@
+buildscript {
+    repositories {
+        mavenCentral()
+        maven {
+            url 'https://oss.sonatype.org/content/repositories/snapshots/'
+        }
+        maven {
+            url 'http://dl.bintray.com/jetbrains/intellij-plugin-service'
+        }
+    }
+    
+    dependencies {
+        classpath 'org.jetbrains.intellij.plugins:gradle-intellij-plugin:0.5.0-SNAPSHOT'
+    }
+    
+}
+
+plugins {
+    id 'java'
+    id 'org.jetbrains.intellij' version '0.4.0'
+}
+
+apply plugin: 'java'
+apply plugin: 'org.jetbrains.intellij'
+
+group 'ore.plugins.idea'
+version '0.0.1'
+
+sourceCompatibility = javaVersion
+targetCompatibility = javaVersion
+
+tasks.withType(JavaCompile) {
+    options.encoding = projectEncoding
+}
+
+intellij {
+    updateSinceUntilBuild false
+}
+
+publishPlugin {
+    username publishUsername
+    password publishPassword
+    channels publishChannels.split(',')
+    host publishHost
+}
+
+repositories {
+    mavenLocal()
+    mavenCentral()
+}
+
+dependencies {
+    compile 'ore.utils.initializrs:spring-web-initializr:1.0-SNAPSHOT'
+    testCompile group: 'junit', name: 'junit', version: '4.12'
+}
