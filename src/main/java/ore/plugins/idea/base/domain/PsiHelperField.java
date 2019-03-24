@@ -8,7 +8,7 @@ import com.intellij.psi.PsiMethod;
 import java.util.Objects;
 
 import static ore.plugins.idea.utils.FormatUtils.toLowerCaseFirstLetterString;
-import static ore.plugins.idea.utils.FormatUtils.toUpperCaseFirstLetterString;
+import static ore.plugins.idea.utils.FormatUtils.toFirstLetterUpperCase;
 
 public class PsiHelperField {
 
@@ -21,7 +21,7 @@ public class PsiHelperField {
 
     public PsiHelperField(PsiField psiField) {
         String psiFieldName = Objects.requireNonNull(psiField.getName());
-        this.upperCaseFieldName = toUpperCaseFirstLetterString(psiFieldName);
+        this.upperCaseFieldName = toFirstLetterUpperCase(psiFieldName);
         this.lowerCaseFieldName = toLowerCaseFirstLetterString(psiFieldName);
         this.fieldType = psiField.getType().getCanonicalText();
     }

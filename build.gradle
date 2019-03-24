@@ -8,11 +8,11 @@ buildscript {
             url 'http://dl.bintray.com/jetbrains/intellij-plugin-service'
         }
     }
-    
+
     dependencies {
         classpath 'org.jetbrains.intellij.plugins:gradle-intellij-plugin:0.5.0-SNAPSHOT'
     }
-    
+
 }
 
 plugins {
@@ -50,6 +50,6 @@ repositories {
 }
 
 dependencies {
-    compile 'ore.utils.initializrs:spring-web-initializr:1.0-SNAPSHOT'
+    compile group: 'ore.utils.initializrs', name: 'spring-web-initializr', version: '1.0.0'
     testCompile group: 'junit', name: 'junit', version: '4.12'
 }

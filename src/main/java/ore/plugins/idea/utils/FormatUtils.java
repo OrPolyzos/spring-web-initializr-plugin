@@ -2,7 +2,7 @@ package ore.plugins.idea.utils;
 
 public class FormatUtils {
 
-    public static String toUpperCaseFirstLetterString(String word) {
+    public static String toFirstLetterUpperCase(String word) {
         return word.substring(0, 1).toUpperCase() + word.substring(1);
     }
 

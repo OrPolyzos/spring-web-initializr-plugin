@@ -14,4 +14,8 @@ public interface TemplateReader {
         }
         return template.replaceAll("\r\n", "\n");
     }
+
+    default String getReplacementString(String value) {
+        return "%<".concat(value).concat(">");
+    }
 }

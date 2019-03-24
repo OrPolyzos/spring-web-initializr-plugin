@@ -7,18 +7,15 @@ import com.intellij.openapi.ui.Messages;
 import com.intellij.openapi.vfs.LocalFileSystem;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.psi.PsiClass;
-import ore.plugins.idea.action.OrePluginAction;
-import ore.plugins.idea.exception.validation.InvalidFileException;
 import ore.plugins.idea.exception.validation.InvalidStructureException;
-import ore.utils.initializrs.spring.web.initializr.base.domain.ResourcePersistable;
-import org.jetbrains.annotations.NotNull;
+import ore.plugins.idea.spring.web.initializr.action.base.ResourceAction;
 
 import java.io.File;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.Objects;
 
-public class FreemarkerAction extends OrePluginAction {
+public class FreemarkerAction extends ResourceAction {
 
     @Override
     public void safeActionPerformed(AnActionEvent anActionEvent) {
@@ -80,18 +77,4 @@ public class FreemarkerAction extends OrePluginAction {
     private VirtualFile getVirtualFolder(VirtualFile virtualFolder, String folderName) {
         return Arrays.stream(virtualFolder.getChildren()).filter(child -> child.getName().equals(folderName)).findFirst().orElseThrow(InvalidStructureException::new);
     }
-
-    @Override
-    public void update(@NotNull AnActionEvent anActionEvent) {
-        safeExecute(() -> {
-            super.update(anActionEvent);
-            PsiClass psiClass = extractPsiClass(anActionEvent);
-            // TODO Currently only supporting access from ResourcePersistable
-            if (psiClass.getImplementsList() == null || Arrays.stream(psiClass.getImplementsList().getReferencedTypes())
-                    .noneMatch(refType -> refType.getName().equals(ResourcePersistable.class.getSimpleName()))) {
-                throw new InvalidFileException();
-            }
-        }, anActionEvent, LOGGER);
-    }
-
 }
