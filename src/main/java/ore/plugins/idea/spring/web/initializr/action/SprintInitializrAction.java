@@ -6,9 +6,11 @@ import com.intellij.psi.PsiClass;
 import ore.plugins.idea.dialog.InputValueDialog;
 import ore.plugins.idea.dialog.PackageInputDialog;
 import ore.plugins.idea.spring.web.initializr.action.base.ResourceAction;
-import ore.plugins.idea.spring.web.initializr.generator.repository.RepositoryGenerator;
+import ore.plugins.idea.spring.web.initializr.generator.ControllerGenerator;
+import ore.plugins.idea.spring.web.initializr.generator.RepositoryGenerator;
+import ore.plugins.idea.spring.web.initializr.generator.ServiceGenerator;
 
-public class RepositoryAction extends ResourceAction {
+public class SprintInitializrAction extends ResourceAction {
 
     @Override
     public void safeActionPerformed(AnActionEvent anActionEvent) {
@@ -21,7 +23,11 @@ public class RepositoryAction extends ResourceAction {
 
 
     private void act(PsiClass psiClass, String packagePath) {
-        WriteCommandAction.runWriteCommandAction(psiClass.getProject(), () -> new RepositoryGenerator(psiClass, packagePath).generate());
+        WriteCommandAction.runWriteCommandAction(psiClass.getProject(), () -> {
+            PsiClass resourceRepositoryClass = new RepositoryGenerator(psiClass, packagePath).generate();
+            PsiClass resourceServiceClass = new ServiceGenerator(psiClass, packagePath, resourceRepositoryClass).generate();
+            new ControllerGenerator(psiClass, packagePath, resourceServiceClass).generate();
+        });
     }
 
 

@@ -7,13 +7,16 @@ import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.psi.*;
 import com.intellij.psi.codeStyle.JavaCodeStyleManager;
 import com.intellij.psi.search.GlobalSearchScope;
+import ore.plugins.idea.base.functionality.ConstructorCreator;
 import ore.plugins.idea.base.functionality.TemplateReader;
 import ore.plugins.idea.exception.OrePluginRuntimeException;
 
 import java.io.File;
+import java.util.Objects;
 
-public abstract class CodeGenerator implements TemplateReader {
+public abstract class CodeGenerator implements TemplateReader, ConstructorCreator {
 
+    protected static final String DEFAULT_JAVA_SRC_PATH = "/src/main/java/";
     protected PsiClass psiClass;
     protected Project project;
 
@@ -22,7 +25,7 @@ public abstract class CodeGenerator implements TemplateReader {
         this.project = project;
     }
 
-    public abstract void generate();
+    public abstract PsiClass generate();
 
     protected VirtualFile createFolderIfNotExists(String path) {
         File packageFile = new File(path);
@@ -34,6 +37,30 @@ public abstract class CodeGenerator implements TemplateReader {
 
     protected PsiJavaFile createJavaFileInDirectory(PsiDirectory psiDirectory, String resourceRepositoryName) {
         return (PsiJavaFile) psiDirectory.createFile(resourceRepositoryName.concat(".java"));
+    }
+
+    protected PsiJavaFile createJavaFileInDirectoryWithPackage(PsiDirectory psiDirectory, String resourceServiceName, String fullPackagePath) {
+        PsiJavaFile resourceServiceFile = createJavaFileInDirectory(psiDirectory, resourceServiceName);
+
+        if (fullPackagePath.length() > 0) {
+            PsiPackageStatement packageStatement = getElementFactory().createPackageStatement(fullPackagePath);
+            resourceServiceFile.addAfter(packageStatement, null);
+        }
+        return resourceServiceFile;
+    }
+
+    protected void addQualifiedAnnotationNameTo(String qualifiedAnnotationName, PsiMember psiMember) {
+        Objects.requireNonNull(psiMember.getModifierList()).addAnnotation(qualifiedAnnotationName);
+    }
+
+    protected void addOverrideTo(PsiMethod resourceFieldGetter) {
+        addQualifiedAnnotationNameTo("java.lang.Override", resourceFieldGetter);
+    }
+
+    protected void addQualifiedExtendsToClass(String qualifiedExtendsName, PsiClass psiClass) {
+        PsiJavaCodeReferenceElement psiJavaCodeReferenceElement = getElementFactory().createReferenceFromText(qualifiedExtendsName, psiClass);
+        PsiReferenceList extendsList = psiClass.getExtendsList();
+        Objects.requireNonNull(extendsList).add(psiJavaCodeReferenceElement);
     }
 
     protected ProjectRootManager getProjectRootManager() {
