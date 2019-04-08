@@ -1,0 +1,40 @@
+body {
+    background-color: rgb(51, 51, 51);
+    text-align: center;
+    color: white;
+}
+
+.subtitle {
+    font-weight: bold;
+    text-align: center;
+    color: lightgreen;
+}
+
+.infoMessage {
+    color: cornflowerblue;
+    font-weight: bold;
+}
+
+.errorMessage {
+    color: red;
+    font-weight: bold;
+}
+
+
+th {
+    color: royalblue;
+}
+
+th, td {
+    text-align: center;
+}
+
+tr:hover {
+    color: black;
+}
+
+.attention {
+    font-weight: bold;
+    font-style: italic;
+    color: red;
+}

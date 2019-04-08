@@ -7,6 +7,7 @@ import ore.plugins.idea.dialog.InputValueDialog;
 import ore.plugins.idea.dialog.PackageInputDialog;
 import ore.plugins.idea.spring.web.initializr.action.base.ResourceAction;
 import ore.plugins.idea.spring.web.initializr.generator.ControllerGenerator;
+import ore.plugins.idea.spring.web.initializr.generator.FreemarkerGenerator;
 import ore.plugins.idea.spring.web.initializr.generator.RepositoryGenerator;
 import ore.plugins.idea.spring.web.initializr.generator.ServiceGenerator;
 
@@ -26,7 +27,9 @@ public class SprintInitializrAction extends ResourceAction {
         WriteCommandAction.runWriteCommandAction(psiClass.getProject(), () -> {
             PsiClass resourceRepositoryClass = new RepositoryGenerator(psiClass, packagePath).generate();
             PsiClass resourceServiceClass = new ServiceGenerator(psiClass, packagePath, resourceRepositoryClass).generate();
-            new ControllerGenerator(psiClass, packagePath, resourceServiceClass).generate();
+            ControllerGenerator controllerGenerator = new ControllerGenerator(psiClass, packagePath, resourceServiceClass);
+            controllerGenerator.generate();
+            new FreemarkerGenerator(psiClass, controllerGenerator).generate();
         });
     }
 

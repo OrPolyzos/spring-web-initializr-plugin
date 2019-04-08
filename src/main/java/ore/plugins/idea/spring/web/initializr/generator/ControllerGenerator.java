@@ -192,12 +192,36 @@ public class ControllerGenerator extends SpringInitializrCodeGenerator implement
     }
 
     private void setupConstantsAndGetters(PsiClass resourceController) {
-        addConstantAndGetter(resourceController, "resourceBaseUri", String.format("/%s", resourcePlural));
-        addConstantAndGetter(resourceController, "resourceViewPath", String.format("/%s/%s", resourceSingular, resourcePlural));
-        addConstantAndGetter(resourceController, "editResourceViewPath", String.format("/%s/edit-%s", resourceSingular, resourceSingular));
-        addConstantAndGetter(resourceController, "resourceFormHolder", String.format("%sForm", resourceSingular));
-        addConstantAndGetter(resourceController, "resourceSearchFormHolder", String.format("%sSearchForm", resourceSingular));
-        addConstantAndGetter(resourceController, "resourceListHolder", String.format("%sList", resourceSingular));
+        addConstantAndGetter(resourceController, "resourceBaseUri", getResourceBaseUri());
+        addConstantAndGetter(resourceController, "resourceViewPath", getResourceViewPath());
+        addConstantAndGetter(resourceController, "editResourceViewPath", getEditResourceViewPath());
+        addConstantAndGetter(resourceController, "resourceFormHolder", getResourceFormHolder());
+        addConstantAndGetter(resourceController, "resourceSearchFormHolder", getResourceSearchFormHolder());
+        addConstantAndGetter(resourceController, "resourceListHolder", getResourceListHolder());
+    }
+
+    public String getResourceListHolder() {
+        return String.format("%sList", resourceSingular);
+    }
+
+    public String getResourceSearchFormHolder() {
+        return String.format("%sSearchForm", resourceSingular);
+    }
+
+    public String getResourceFormHolder() {
+        return String.format("%sForm", resourceSingular);
+    }
+
+    public String getEditResourceViewPath() {
+        return String.format("/%s/edit-%s", resourceSingular, resourceSingular);
+    }
+
+    public String getResourceViewPath() {
+        return String.format("/%s/%s", resourceSingular, resourcePlural);
+    }
+
+    public String getResourceBaseUri() {
+        return String.format("/%s", resourcePlural);
     }
 
     private void addConstantAndGetter(PsiClass resourceController, String name, String value) {
