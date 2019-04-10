@@ -5,6 +5,7 @@ import com.intellij.psi.*;
 import com.intellij.psi.util.PsiUtil;
 import ore.plugins.idea.base.functionality.TemplateReader;
 import ore.plugins.idea.spring.web.initializr.generator.base.SpringInitializrCodeGenerator;
+import ore.plugins.idea.spring.web.initializr.model.SpringWebInitializrRequest;
 import ore.plugins.idea.utils.FormatUtils;
 
 import java.util.Collections;
@@ -16,32 +17,33 @@ public class ServiceGenerator extends SpringInitializrCodeGenerator implements T
     private static final String RESOURCE_SERVICE_NAME_TEMPLATE = "%sResourceService";
     private static final String SERVICE_ANNOTATION_QN = "org.springframework.stereotype.Service";
 
-    private String packagePath;
     private PsiClass resourceRepository;
 
-    public ServiceGenerator(PsiClass psiClass, String packagePath, PsiClass resourceRepository) {
-        super(psiClass, psiClass.getProject());
-        this.packagePath = packagePath;
+    public ServiceGenerator(SpringWebInitializrRequest springWebInitializrRequest, PsiClass resourceRepository) {
+        super(springWebInitializrRequest);
         this.resourceRepository = resourceRepository;
     }
 
 
     @Override
     public PsiClass generate() {
-        String fullPackagePath = getProjectRootManager().getContentRoots()[0].getPath().concat(DEFAULT_JAVA_SRC_PATH).concat(packagePath.replaceAll("\\.", "/"));
+        String fullPackagePath = getProjectRootManager().getContentRoots()[0].getPath().concat(DEFAULT_JAVA_SRC_PATH).concat(springWebInitializrRequest.getResourceServicePackage().replaceAll("\\.", "/"));
         VirtualFile vfPackage = createFolderIfNotExists(fullPackagePath);
         PsiDirectory pdPackage = getPsiManager().findDirectory(vfPackage);
         return createResourceService(pdPackage);
     }
 
     private PsiClass createResourceService(PsiDirectory psiDirectory) {
-        String resourceServiceName = String.format(RESOURCE_SERVICE_NAME_TEMPLATE, psiClass.getName());
-        PsiJavaFile resourceServiceFile = createJavaFileInDirectoryWithPackage(psiDirectory, resourceServiceName, packagePath);
+        String resourceServiceName = String.format(RESOURCE_SERVICE_NAME_TEMPLATE, springWebInitializrRequest.getResourceClass().getName());
+        PsiJavaFile resourceServiceFile = createJavaFileInDirectoryWithPackage(psiDirectory, resourceServiceName, springWebInitializrRequest.getResourceServicePackage());
 
         PsiClass resourceService = getElementFactory().createClass(resourceServiceName);
         addQualifiedAnnotationNameTo(SERVICE_ANNOTATION_QN, resourceService);
 
-        String resourceServiceQualifiedName = String.format("spring.web.initializr.base.service.ResourceService<%s,%s,%s>", psiClass.getQualifiedName(), psiClass.getQualifiedName(), extractResourceIdQualifiedName());
+        String resourceServiceQualifiedName = String.format("spring.web.initializr.base.service.ResourceService<%s,%s,%s>",
+                springWebInitializrRequest.getResourceClass().getQualifiedName(),
+                springWebInitializrRequest.getResourceSearchFormClass().getQualifiedName(),
+                springWebInitializrRequest.getResourceIdQualifiedName());
         addQualifiedExtendsToClass(resourceServiceQualifiedName, resourceService);
 
         PsiField resourceRepositoryElement = getElementFactory().createField(FormatUtils.toFirstLetterLowerCase(Objects.requireNonNull(resourceRepository.getName())), getElementFactory().createType(resourceRepository));

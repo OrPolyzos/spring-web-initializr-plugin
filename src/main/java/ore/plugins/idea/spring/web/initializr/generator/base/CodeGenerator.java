@@ -7,14 +7,14 @@ import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.psi.*;
 import com.intellij.psi.codeStyle.JavaCodeStyleManager;
 import com.intellij.psi.search.GlobalSearchScope;
-import ore.plugins.idea.base.functionality.ConstructorCreator;
+import ore.plugins.idea.base.functionality.ConstructorProvider;
 import ore.plugins.idea.base.functionality.TemplateReader;
 import ore.plugins.idea.exception.OrePluginRuntimeException;
 
 import java.io.File;
 import java.util.Objects;
 
-public abstract class CodeGenerator implements TemplateReader, ConstructorCreator {
+public abstract class CodeGenerator implements TemplateReader, ConstructorProvider {
 
     protected static final String DEFAULT_JAVA_SRC_PATH = "/src/main/java/";
     protected PsiClass psiClass;
@@ -25,7 +25,7 @@ public abstract class CodeGenerator implements TemplateReader, ConstructorCreato
         this.project = project;
     }
 
-    public abstract PsiClass generate();
+    public abstract PsiClass generate() throws Exception;
 
     protected VirtualFile createFolderIfNotExists(String path) {
         File packageFile = new File(path);
@@ -61,6 +61,12 @@ public abstract class CodeGenerator implements TemplateReader, ConstructorCreato
         PsiJavaCodeReferenceElement psiJavaCodeReferenceElement = getElementFactory().createReferenceFromText(qualifiedExtendsName, psiClass);
         PsiReferenceList extendsList = psiClass.getExtendsList();
         Objects.requireNonNull(extendsList).add(psiJavaCodeReferenceElement);
+    }
+
+    protected void addQualifiedImplementsToClass(String qualifiedImplementsName, PsiClass psiClass) {
+        PsiJavaCodeReferenceElement psiJavaCodeReferenceElement = getElementFactory().createReferenceFromText(qualifiedImplementsName, psiClass);
+        PsiReferenceList implementsList = psiClass.getImplementsList();
+        Objects.requireNonNull(implementsList).add(psiJavaCodeReferenceElement);
     }
 
     protected ProjectRootManager getProjectRootManager() {

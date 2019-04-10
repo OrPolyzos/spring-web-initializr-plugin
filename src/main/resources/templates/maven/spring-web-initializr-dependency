@@ -1,0 +1,8 @@
+Spring Web Initializr Plugin required the spring-web-initializr dependency to work.
+Please add it into the pom.xml and try again.
+
+        <dependency>
+            <groupId>ore.utils.initializrs</groupId>
+            <artifactId>spring-web-initializr</artifactId>
+            <version>1.0.0</version>
+        </dependency>

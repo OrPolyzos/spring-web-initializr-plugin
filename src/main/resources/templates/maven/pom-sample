@@ -1,0 +1,21 @@
+Spring Web Initializr Plugin is expecting some Spring dependencies (web, data-jpa, freemarker)
+Please make sure you add them into the pom.xml file or substitute them as you see fit.
+
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-web</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-freemarker</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-data-jpa</artifactId>
+        </dependency>
+        <!-- Extra dependency needed for spring-web-initializr-plugin to work -->
+        <dependency>
+            <groupId>ore.utils.initializrs</groupId>
+            <artifactId>spring-web-initializr</artifactId>
+            <version>1.0.0</version>
+        </dependency>

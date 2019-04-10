@@ -1,17 +1,12 @@
 body {
-    background-color: rgb(51, 51, 51);
-    text-align: center;
+    background-color: mediumseagreen;
+}
+
+div.page-header {
     color: white;
 }
 
-.subtitle {
-    font-weight: bold;
-    text-align: center;
-    color: lightgreen;
-}
-
 .infoMessage {
-    color: cornflowerblue;
     font-weight: bold;
 }
 
@@ -20,21 +15,16 @@ body {
     font-weight: bold;
 }
 
-
-th {
-    color: royalblue;
-}
-
-th, td {
-    text-align: center;
-}
-
-tr:hover {
-    color: black;
-}
-
 .attention {
+    animation: blinker 1s linear infinite;
+    font-size: large;
     font-weight: bold;
     font-style: italic;
     color: red;
+}
+
+@keyframes blinker {
+    50% {
+        opacity: 0;
+    }
 }

@@ -1,21 +1,15 @@
 package ore.plugins.idea.spring.web.initializr.generator.base;
 
-import com.intellij.openapi.project.Project;
-import com.intellij.psi.PsiClass;
 import com.intellij.psi.PsiMember;
-import org.jetbrains.annotations.NotNull;
-
-import java.util.Objects;
+import ore.plugins.idea.spring.web.initializr.model.SpringWebInitializrRequest;
 
 public abstract class SpringInitializrCodeGenerator extends CodeGenerator {
 
-    public SpringInitializrCodeGenerator(PsiClass psiClass, Project project) {
-        super(psiClass, project);
-    }
+    protected SpringWebInitializrRequest springWebInitializrRequest;
 
-    @NotNull
-    protected String extractResourceIdQualifiedName() {
-        return Objects.requireNonNull(psiClass.getImplementsList()).getReferencedTypes()[1].getParameters()[0].getCanonicalText();
+    public SpringInitializrCodeGenerator(SpringWebInitializrRequest springWebInitializrRequest) {
+        super(springWebInitializrRequest.getResourceClass(), springWebInitializrRequest.getResourceClass().getProject());
+        this.springWebInitializrRequest = springWebInitializrRequest;
     }
 
     protected void addAutowiredTo(PsiMember psiMember) {

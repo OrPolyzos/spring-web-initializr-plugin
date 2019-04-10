@@ -6,8 +6,10 @@ import com.intellij.openapi.ui.Messages;
 import com.intellij.openapi.vfs.LocalFileSystem;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.psi.*;
+import ore.plugins.idea.exception.validation.InvalidFileException;
 import ore.plugins.idea.exception.validation.InvalidStructureException;
-import ore.plugins.idea.spring.web.initializr.generator.base.CodeGenerator;
+import ore.plugins.idea.spring.web.initializr.generator.base.SpringInitializrCodeGenerator;
+import ore.plugins.idea.spring.web.initializr.model.SpringWebInitializrRequest;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.File;
@@ -17,13 +19,15 @@ import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 import static ore.plugins.idea.utils.FormatUtils.*;
 
-public class FreemarkerGenerator extends CodeGenerator {
+public class FreemarkerGenerator extends SpringInitializrCodeGenerator {
 
     private static final String BASE_RESOURCE_VIEW_TEMPLATE = "/templates/freemarker/base-resource-view";
+    private static final String EDIT_RESOURCE_VIEW_TEMPLATE = "/templates/freemarker/edit-resource-view";
     private static final String RESOURCE_FORM_FIELD_TEMPLATE = "/templates/freemarker/section/resource-form-field";
     private static final String RESOURCE_TABLE_HEAD_FORM_FIELD_TEMPLATE = "/templates/freemarker/section/resource-table-head-field";
     private static final String RESOURCE_TABLE_BODY_FORM_FIELD_TEMPLATE = "/templates/freemarker/section/resource-table-body-field";
@@ -34,60 +38,41 @@ public class FreemarkerGenerator extends CodeGenerator {
     private String resourceSingular;
     private String resourcePlural;
 
-    private PsiClass resourceForm;
-    private PsiClass resourceSearchForm;
-
-    public FreemarkerGenerator(PsiClass psiClass, ControllerGenerator controllerGenerator) {
-        super(psiClass, psiClass.getProject());
+    public FreemarkerGenerator(SpringWebInitializrRequest springWebInitializrRequest, ControllerGenerator controllerGenerator) {
+        super(springWebInitializrRequest);
         this.controllerGenerator = controllerGenerator;
-        this.resourceSingular = toFirstLetterLowerCase(Objects.requireNonNull(psiClass.getName()));
+        this.resourceSingular = toFirstLetterLowerCase(Objects.requireNonNull(springWebInitializrRequest.getResourceClass().getName()));
         this.resourcePlural = toPlural(resourceSingular);
 
     }
 
     @Override
     public PsiClass generate() {
-        VirtualFile staticFolder = createBaseStructureTo(psiClass.getProject(), "/static");
+        VirtualFile staticFolder = createBaseStructureTo(springWebInitializrRequest.getResourceClass().getProject(), "/static");
         createCssStylesFile(staticFolder);
 
-        VirtualFile templates = createBaseStructureTo(psiClass.getProject(), "/templates");
-
+        VirtualFile templates = createBaseStructureTo(springWebInitializrRequest.getResourceClass().getProject(), "/templates");
         String resourceFolderPath = String.format("%s/%s", templates.getPath(), resourceSingular);
-        validateFileDoesNotExist(psiClass.getProject(), resourceFolderPath);
+        validateFileDoesNotExist(springWebInitializrRequest.getResourceClass().getProject(), resourceFolderPath);
 
-        VirtualFile resourceFolder = createVirtualFileIfNotExists(psiClass.getProject(), resourceFolderPath, true);
-        VirtualFile editResourceView = createVirtualFileIfNotExists(psiClass.getProject(), String.format("%s/%s.ftl", templates.getPath(), controllerGenerator.getEditResourceViewPath()), false);
+        createVirtualFileIfNotExists(springWebInitializrRequest.getResourceClass().getProject(), resourceFolderPath, true);
 
         createBaseResourceView(templates);
-        //createEditResourceView(templates);
+        createEditResourceView(templates);
         return null;
     }
 
     private void createCssStylesFile(VirtualFile staticFolder) {
-        VirtualFile cssStylesFile = createVirtualFileIfNotExists(psiClass.getProject(), String.format("%s/spring-web-initializr-plugin-styles.css", staticFolder.getPath()), false);
-        try {
-            Files.write(Paths.get(cssStylesFile.getPath()), getTemplate(CSS_STYLES_TEMPLATE).getBytes());
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+        VirtualFile cssStylesFile = createVirtualFileIfNotExists(springWebInitializrRequest.getResourceClass().getProject(), String.format("%s/spring-web-initializr-plugin-styles.css", staticFolder.getPath()), false);
+        writeContentToFile(cssStylesFile, getTemplate(CSS_STYLES_TEMPLATE));
     }
 
 
     private void createBaseResourceView(VirtualFile templates) {
-        VirtualFile baseResourceView = createVirtualFileIfNotExists(psiClass.getProject(), String.format("%s/%s.ftl", templates.getPath(), controllerGenerator.getResourceViewPath()), false);
+        VirtualFile baseResourceView = createVirtualFileIfNotExists(springWebInitializrRequest.getResourceClass().getProject(), String.format("%s/%s.ftl", templates.getPath(), controllerGenerator.getResourceViewPath()), false);
+        List<PsiField> resourceFields = extractCandidateResourceFields(field -> true);
 
-        List<PsiField> resourceFields = extractCandidateResourceFields();
-
-        String resourceFormContent = resourceFields
-                .stream()
-                .map(field -> {
-                    String resourceFieldTemplate = getTemplate(RESOURCE_FORM_FIELD_TEMPLATE);
-                    return resourceFieldTemplate
-                            .replaceAll(getReplacementString("resourceFieldNameLowerCase"), toFirstLetterLowerCase(field.getNameIdentifier().getText()))
-                            .replaceAll(getReplacementString("resourceFieldNameUpperCase"), toFirstLetterUpperCase(field.getNameIdentifier().getText()))
-                            .replaceAll(getReplacementString("resourceFieldName"), field.getNameIdentifier().getText())
-                            .replaceAll(getReplacementString("resourceForm"), controllerGenerator.getResourceFormHolder());
-                }).collect(Collectors.joining(""));
+        String resourceFormContent = extractResourceFormContent(resourceFields);
 
         String resourceTableHeadContent = resourceFields
                 .stream()
@@ -110,15 +95,39 @@ public class FreemarkerGenerator extends CodeGenerator {
                 .replace(getReplacementString("resourceFormContent"), resourceFormContent)
                 .replace(getReplacementString("resourceTableHeadContent"), resourceTableHeadContent)
                 .replace(getReplacementString("resourceTableBodyContent"), resourceTableBodyContent);
-        try {
-            Files.write(Paths.get(baseResourceView.getPath()), baseResourceViewFtl.getBytes());
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+
+        writeContentToFile(baseResourceView, baseResourceViewFtl);
+    }
+
+    private void createEditResourceView(VirtualFile templates) {
+        VirtualFile editResourceView = createVirtualFileIfNotExists(springWebInitializrRequest.getResourceClass().getProject(), String.format("%s/%s.ftl", templates.getPath(), controllerGenerator.getEditResourceViewPath()), false);
+        List<PsiField> resourceFields = extractCandidateResourceFields(field -> !field.equals(springWebInitializrRequest.getResourceIdPsiField()));
+        String resourceFormContent = extractResourceFormContent(resourceFields);
+        String editResourceViewContent = getTemplate(EDIT_RESOURCE_VIEW_TEMPLATE)
+                .replaceAll(getReplacementString("editResourceViewTitle"), String.format("Edit %s", toFirstLetterUpperCase(resourceSingular)))
+                .replaceAll(getReplacementString("resourceBaseUri"), controllerGenerator.getResourceBaseUri())
+                .replaceAll(getReplacementString("resourceForm"), controllerGenerator.getResourceFormHolder())
+                .replace(getReplacementString("resourceFormContent"), resourceFormContent);
+
+        writeContentToFile(editResourceView, editResourceViewContent);
+    }
+
+    private String extractResourceFormContent(List<PsiField> resourceFields) {
+        return resourceFields
+                .stream()
+                .filter(field -> !field.equals(springWebInitializrRequest.getResourceIdPsiField()))
+                .map(field -> {
+                    String resourceFieldTemplate = getTemplate(RESOURCE_FORM_FIELD_TEMPLATE);
+                    return resourceFieldTemplate
+                            .replaceAll(getReplacementString("resourceFieldNameLowerCase"), toFirstLetterLowerCase(field.getNameIdentifier().getText()))
+                            .replaceAll(getReplacementString("resourceFieldNameUpperCase"), toFirstLetterUpperCase(field.getNameIdentifier().getText()))
+                            .replaceAll(getReplacementString("resourceFieldName"), field.getNameIdentifier().getText())
+                            .replaceAll(getReplacementString("resourceForm"), controllerGenerator.getResourceFormHolder());
+                }).collect(Collectors.joining(""));
     }
 
     @NotNull
-    private List<PsiField> extractCandidateResourceFields() {
+    private List<PsiField> extractCandidateResourceFields(Predicate<PsiField> predicate) {
         return Arrays.stream(psiClass.getFields())
                 .filter(field -> {
                     if (field.getType() instanceof PsiPrimitiveType && !field.getType().equals(PsiType.VOID)) {
@@ -140,7 +149,9 @@ public class FreemarkerGenerator extends CodeGenerator {
                         }
                     }
                     return false;
-                }).collect(Collectors.toList());
+                })
+                .filter(predicate)
+                .collect(Collectors.toList());
     }
 
     private VirtualFile createBaseStructureTo(Project project, String afterResources) {
@@ -173,6 +184,15 @@ public class FreemarkerGenerator extends CodeGenerator {
             }
         }
         return LocalFileSystem.getInstance().refreshAndFindFileByIoFile(file);
+    }
+
+
+    private void writeContentToFile(VirtualFile virtualFile, String content) {
+        try {
+            Files.write(Paths.get(virtualFile.getPath()), content.getBytes());
+        } catch (IOException e) {
+            throw new InvalidFileException(String.format("Failed to write to file. Message %s: ", e.getMessage()));
+        }
     }
 
 }

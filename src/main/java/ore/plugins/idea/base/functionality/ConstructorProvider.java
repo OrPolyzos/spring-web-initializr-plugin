@@ -9,7 +9,7 @@ import ore.plugins.idea.base.domain.PsiHelperField;
 import java.util.List;
 import java.util.stream.Collectors;
 
-public interface ConstructorCreator {
+public interface ConstructorProvider {
 
     String CONSTRUCTOR_TEMPLATE = "%s(%s){%s}";
     String CONSTRUCTOR_ARGUMENT_TEMPLATE = "%s %s";

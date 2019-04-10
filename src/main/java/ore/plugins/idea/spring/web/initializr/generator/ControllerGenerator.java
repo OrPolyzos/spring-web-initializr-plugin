@@ -5,13 +5,13 @@ import com.intellij.psi.*;
 import com.intellij.psi.util.PsiUtil;
 import ore.plugins.idea.base.functionality.TemplateReader;
 import ore.plugins.idea.spring.web.initializr.generator.base.SpringInitializrCodeGenerator;
+import ore.plugins.idea.spring.web.initializr.model.SpringWebInitializrRequest;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 import static ore.plugins.idea.utils.FormatUtils.*;
 
@@ -23,53 +23,67 @@ public class ControllerGenerator extends SpringInitializrCodeGenerator implement
     private static final String GET_MAPPING_QN = "org.springframework.web.bind.annotation.GetMapping";
     private static final String POST_MAPPING_QN = "org.springframework.web.bind.annotation.PostMapping";
 
-    private String packagePath;
     private PsiClass resourceService;
 
     private String resourceSingular;
     private String resourcePlural;
 
-    private PsiClass resourceForm;
-    private PsiClass resourceSearchForm;
-
-    public ControllerGenerator(PsiClass psiClass, String packagePath, PsiClass resourceService) {
-        super(psiClass, psiClass.getProject());
-        this.packagePath = packagePath;
+    public ControllerGenerator(SpringWebInitializrRequest springWebInitializrRequest, PsiClass resourceService) {
+        super(springWebInitializrRequest);
         this.resourceService = resourceService;
-        this.resourceSingular = toFirstLetterLowerCase(Objects.requireNonNull(psiClass.getName()));
+        this.resourceSingular = toFirstLetterLowerCase(Objects.requireNonNull(springWebInitializrRequest.getResourceClass().getName()));
         this.resourcePlural = toPlural(resourceSingular);
-
-        // TODO Will be changed when ResourceForm & ResourceSearchForm will be supported
-        this.resourceForm = psiClass;
-        this.resourceSearchForm = psiClass;
     }
 
     @Override
     public PsiClass generate() {
-        String fullPackagePath = getProjectRootManager().getContentRoots()[0].getPath().concat(DEFAULT_JAVA_SRC_PATH).concat(packagePath.replaceAll("\\.", "/"));
+        String fullPackagePath = getProjectRootManager().getContentRoots()[0].getPath().concat(DEFAULT_JAVA_SRC_PATH).concat(springWebInitializrRequest.getResourceControllerPackage().replaceAll("\\.", "/"));
         VirtualFile vfPackage = createFolderIfNotExists(fullPackagePath);
         PsiDirectory pdPackage = getPsiManager().findDirectory(vfPackage);
         return createResourceController(pdPackage);
     }
 
     private PsiClass createResourceController(PsiDirectory psiDirectory) {
-        String resourceControllerName = String.format(RESOURCE_SERVICE_NAME_TEMPLATE, psiClass.getName());
-        PsiJavaFile resourceServiceFile = createJavaFileInDirectoryWithPackage(psiDirectory, resourceControllerName, packagePath);
+        String resourceControllerName = String.format(RESOURCE_SERVICE_NAME_TEMPLATE, springWebInitializrRequest.getResourceClass().getName());
+        PsiJavaFile resourceServiceFile = createJavaFileInDirectoryWithPackage(psiDirectory, resourceControllerName, springWebInitializrRequest.getResourceControllerPackage());
 
         PsiClass resourceController = getElementFactory().createClass(resourceControllerName);
         addQualifiedAnnotationNameTo(CONTROLLER_ANNOTATION_QN, resourceController);
 
-        String resourceControllerQualifiedName = String.format("spring.web.initializr.base.controller.ResourceController<%s, %s, %s, %s>", psiClass.getQualifiedName(), extractResourceIdQualifiedName(), resourceForm.getQualifiedName(), resourceSearchForm.getQualifiedName());
+        String resourceControllerQualifiedName = String.format("spring.web.initializr.base.controller.ResourceController<%s, %s, %s, %s>",
+                springWebInitializrRequest.getResourceClass().getQualifiedName(),
+                springWebInitializrRequest.getResourceIdQualifiedName(),
+                springWebInitializrRequest.getResourceFormClass().getQualifiedName(),
+                springWebInitializrRequest.getResourceSearchFormClass().getQualifiedName());
         addQualifiedExtendsToClass(resourceControllerQualifiedName, resourceController);
 
         setupConstructor(resourceController);
         setupConstantsAndGetters(resourceController);
         setupServletMethods(resourceController);
+        setupConvertMethods(resourceController);
 
         getJavaCodeStyleManager().shortenClassReferences(resourceController);
         resourceServiceFile.add(resourceController);
 
         return resourceController;
+    }
+
+    private void setupConvertMethods(PsiClass resourceController) {
+        PsiMethod resourceFormToResourceMethod = getElementFactory().createMethodFromText(String.format("protected %s resourceFormToResource(%s %s) { return %s; }",
+                springWebInitializrRequest.getResourceClass().getQualifiedName(),
+                springWebInitializrRequest.getResourceFormClass().getQualifiedName(),
+                toFirstLetterLowerCase(Objects.requireNonNull(springWebInitializrRequest.getResourceFormClass().getName())),
+                toFirstLetterLowerCase(Objects.requireNonNull(springWebInitializrRequest.getResourceClass().getName()))), resourceController.getContext());
+        addOverrideTo(resourceFormToResourceMethod);
+        resourceController.add(resourceFormToResourceMethod);
+
+        PsiMethod resourceToResourceFormMethod = getElementFactory().createMethodFromText(String.format("protected %s resourceToResourceForm(%s %s) { return %s; }",
+                springWebInitializrRequest.getResourceFormClass().getQualifiedName(),
+                springWebInitializrRequest.getResourceClass().getQualifiedName(),
+                toFirstLetterLowerCase(Objects.requireNonNull(springWebInitializrRequest.getResourceClass().getName())),
+                toFirstLetterLowerCase(Objects.requireNonNull(springWebInitializrRequest.getResourceFormClass().getName()))), resourceController.getContext());
+        addOverrideTo(resourceToResourceFormMethod);
+        resourceController.add(resourceToResourceFormMethod);
     }
 
     private void setupServletMethods(PsiClass resourceController) {
@@ -101,7 +115,7 @@ public class ControllerGenerator extends SpringInitializrCodeGenerator implement
                                 "org.springframework.ui.Model model, " +
                                 "org.springframework.web.servlet.mvc.support.RedirectAttributes redirectAttributes) { " +
                                 "return super.createResource(resourceForm, bindingResult, model, redirectAttributes); " +
-                                "}", resourceForm.getQualifiedName())
+                                "}", springWebInitializrRequest.getResourceFormClass().getQualifiedName())
                         , resourceController.getContext());
         addOverrideTo(psiMethod);
         psiMethod.getModifierList().addAfter(annotation, psiMethod.getModifierList().getAnnotations()[0]);
@@ -116,7 +130,7 @@ public class ControllerGenerator extends SpringInitializrCodeGenerator implement
                         "@org.springframework.web.bind.annotation.PathVariable(\"resourceId\") %s resourceId, " +
                         "org.springframework.ui.Model model, " +
                         "org.springframework.web.servlet.mvc.support.RedirectAttributes redirectAttributes) {" +
-                        "return super.deleteResource(resourceId, model, redirectAttributes); }", extractResourceIdQualifiedName()), resourceController.getContext());
+                        "return super.deleteResource(resourceId, model, redirectAttributes); }", springWebInitializrRequest.getResourceIdQualifiedName()), resourceController.getContext());
         addOverrideTo(psiMethod);
         psiMethod.getModifierList().addAfter(annotation, psiMethod.getModifierList().getAnnotations()[0]);
         return psiMethod;
@@ -130,7 +144,7 @@ public class ControllerGenerator extends SpringInitializrCodeGenerator implement
                         "@org.springframework.web.bind.annotation.PathVariable(\"resourceId\") %s resourceId, " +
                         "org.springframework.ui.Model model, " +
                         "org.springframework.web.servlet.mvc.support.RedirectAttributes redirectAttributes) {" +
-                        "return super.getEditResourceView(resourceId, model, redirectAttributes); }", extractResourceIdQualifiedName()), resourceController.getContext());
+                        "return super.getEditResourceView(resourceId, model, redirectAttributes); }", springWebInitializrRequest.getResourceIdQualifiedName()), resourceController.getContext());
         addOverrideTo(psiMethod);
         psiMethod.getModifierList().addAfter(annotation, psiMethod.getModifierList().getAnnotations()[0]);
         return psiMethod;
@@ -141,13 +155,15 @@ public class ControllerGenerator extends SpringInitializrCodeGenerator implement
         PsiAnnotation annotation = getElementFactory().createAnnotationFromText(String.format("@%s(\"%s/{resourceId}/edit\")", POST_MAPPING_QN, resourcePlural), resourceController.getContext());
         PsiMethod psiMethod = getElementFactory()
                 .createMethodFromText(String.format("public String editResource(" +
-                        "@org.springframework.web.bind.annotation.PathVariable(\"resourceId\") %s resourceId, " +
-                        "@javax.validation.Valid @org.springframework.web.bind.annotation.ModelAttribute(RESOURCE_FORM_HOLDER) %s resourceForm, " +
-                        "org.springframework.validation.BindingResult bindingResult, " +
-                        "org.springframework.ui.Model model, " +
-                        "org.springframework.web.servlet.mvc.support.RedirectAttributes redirectAttributes, " +
-                        "javax.servlet.http.HttpServletRequest httpServletRequest) {" +
-                        "return super.editResource(resourceId, resourceForm, bindingResult, model, redirectAttributes, httpServletRequest); }", extractResourceIdQualifiedName(), resourceForm.getQualifiedName()), resourceController.getContext());
+                                "@org.springframework.web.bind.annotation.PathVariable(\"resourceId\") %s resourceId, " +
+                                "@javax.validation.Valid @org.springframework.web.bind.annotation.ModelAttribute(RESOURCE_FORM_HOLDER) %s resourceForm, " +
+                                "org.springframework.validation.BindingResult bindingResult, " +
+                                "org.springframework.ui.Model model, " +
+                                "org.springframework.web.servlet.mvc.support.RedirectAttributes redirectAttributes, " +
+                                "javax.servlet.http.HttpServletRequest httpServletRequest) {" +
+                                "return super.editResource(resourceId, resourceForm, bindingResult, model, redirectAttributes, httpServletRequest); }",
+                        springWebInitializrRequest.getResourceIdQualifiedName(), springWebInitializrRequest.getResourceFormClass().getQualifiedName()),
+                        resourceController.getContext());
         addOverrideTo(psiMethod);
         psiMethod.getModifierList().addAfter(annotation, psiMethod.getModifierList().getAnnotations()[0]);
         return psiMethod;
@@ -158,11 +174,12 @@ public class ControllerGenerator extends SpringInitializrCodeGenerator implement
         PsiAnnotation annotation = getElementFactory().createAnnotationFromText(String.format("@%s(\"%s/search\")", POST_MAPPING_QN, resourcePlural), resourceController.getContext());
         PsiMethod psiMethod = getElementFactory()
                 .createMethodFromText(String.format("public String searchBy(" +
-                        "@javax.validation.Valid @org.springframework.web.bind.annotation.ModelAttribute(RESOURCE_SEARCH_FORM_HOLDER) %s resourceSearchForm, " +
-                        "org.springframework.validation.BindingResult bindingResult, " +
-                        "org.springframework.ui.Model model, " +
-                        "org.springframework.web.servlet.mvc.support.RedirectAttributes redirectAttributes) {" +
-                        "return super.searchBy(resourceSearchForm, bindingResult, model, redirectAttributes); }", resourceSearchForm.getQualifiedName()), resourceController.getContext());
+                                "@javax.validation.Valid @org.springframework.web.bind.annotation.ModelAttribute(RESOURCE_SEARCH_FORM_HOLDER) %s resourceSearchForm, " +
+                                "org.springframework.validation.BindingResult bindingResult, " +
+                                "org.springframework.ui.Model model, " +
+                                "org.springframework.web.servlet.mvc.support.RedirectAttributes redirectAttributes) {" +
+                                "return super.searchBy(resourceSearchForm, bindingResult, model, redirectAttributes); }",
+                        springWebInitializrRequest.getResourceSearchFormClass().getQualifiedName()), resourceController.getContext());
         addOverrideTo(psiMethod);
         psiMethod.getModifierList().addAfter(annotation, psiMethod.getModifierList().getAnnotations()[0]);
         return psiMethod;
@@ -174,15 +191,10 @@ public class ControllerGenerator extends SpringInitializrCodeGenerator implement
         PsiUtil.setModifierProperty(resourceServiceElement, PsiModifier.FINAL, true);
 
         List<PsiField> constructorArguments = Collections.singletonList(resourceServiceElement);
-        List<String> superArguments =
-                Stream.of(String.format("%s.class", psiClass.getQualifiedName()),
-                        String.format("%s.class", resourceForm.getQualifiedName()),
-                        String.format("%s.class", resourceSearchForm.getQualifiedName()),
-                        // TODO Will be changed when ResourceForm & ResourceSearchForm will be supported
-                        "resource -> resource",
-                        "resource -> resource",
-                        resourceServiceElement.getNameIdentifier().getText())
-                        .collect(Collectors.toList());
+        List<String> superArguments = constructorArguments
+                .stream()
+                .map(e -> e.getNameIdentifier().getText())
+                .collect(Collectors.toList());
 
         PsiMethod constructor = extractConstructorForClass(resourceController, constructorArguments, constructorArguments, superArguments);
         PsiUtil.setModifierProperty(constructor, PsiModifier.PUBLIC, true);

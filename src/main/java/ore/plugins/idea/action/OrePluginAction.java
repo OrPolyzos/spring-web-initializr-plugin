@@ -9,7 +9,6 @@ import com.intellij.psi.PsiClass;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiFile;
 import com.intellij.psi.util.PsiTreeUtil;
-import ore.plugins.idea.base.functionality.MessageRenderer;
 import ore.plugins.idea.base.functionality.ExceptionResolver;
 import ore.plugins.idea.exception.validation.InvalidFileException;
 import org.jetbrains.annotations.NotNull;
@@ -18,12 +17,12 @@ import org.slf4j.LoggerFactory;
 
 import java.util.Objects;
 
-public abstract class OrePluginAction extends AnAction implements MessageRenderer, ExceptionResolver {
+public abstract class OrePluginAction extends AnAction implements ExceptionResolver {
 
     protected static final Logger LOGGER = LoggerFactory.getLogger(OrePluginAction.class);
 
     @Override
-    public void actionPerformed(AnActionEvent anActionEvent) {
+    public void actionPerformed(@NotNull AnActionEvent anActionEvent) {
         safeExecute(() -> safeActionPerformed(anActionEvent), anActionEvent, LOGGER);
     }
 

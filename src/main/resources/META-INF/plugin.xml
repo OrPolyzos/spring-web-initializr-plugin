@@ -18,18 +18,9 @@
     </change-notes>
 
     <actions>
-        <group id="spring-web-initializr-group" text="Spring Web Initializr" popup="true">
+        <action id="action-spring-web-initializr" class="ore.plugins.idea.spring.web.initializr.action.SpringWebInitializrAction"
+                text="Spring Web Initializr" description="Generates all">
             <add-to-group group-id="EditorPopupMenu" anchor="first"/>
-        </group>
-        <action id="action-freemarker" class="ore.plugins.idea.spring.web.initializr.action.FreemarkerAction"
-                text="Freemarker"
-                description="Generates Freemarker resources">
-            <add-to-group group-id="spring-web-initializr-group" anchor="first"/>
-        </action>
-        <action id="action-repository" class="ore.plugins.idea.spring.web.initializr.action.SprintInitializrAction"
-                text="Generate"
-                description="Generates everything required">
-            <add-to-group group-id="spring-web-initializr-group" anchor="after" relative-to-action="action-freemarker"/>
         </action>
     </actions>
 </idea-plugin>
