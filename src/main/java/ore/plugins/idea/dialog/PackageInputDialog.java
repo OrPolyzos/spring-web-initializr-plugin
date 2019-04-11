@@ -22,7 +22,7 @@ public class PackageInputDialog extends InputValueDialog {
 
     private void validatePackagePath(String packagePath) {
         if (packagePath.length() > 0 && !packagePath.toLowerCase().matches(JAVA_PACKAGE_PATTERN)) {
-            throw new ValidationException(psiClass, "Invalid package name");
+            throw new ValidationException("Invalid package name");
         }
     }
 }

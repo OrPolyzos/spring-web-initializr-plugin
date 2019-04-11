@@ -25,7 +25,7 @@ public abstract class CodeGenerator implements TemplateReader, ConstructorProvid
         this.project = project;
     }
 
-    public abstract PsiClass generate() throws Exception;
+    public abstract PsiClass generate();
 
     protected VirtualFile createFolderIfNotExists(String path) {
         File packageFile = new File(path);

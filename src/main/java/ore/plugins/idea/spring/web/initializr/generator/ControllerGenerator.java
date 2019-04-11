@@ -4,7 +4,7 @@ import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.psi.*;
 import com.intellij.psi.util.PsiUtil;
 import ore.plugins.idea.base.functionality.TemplateReader;
-import ore.plugins.idea.spring.web.initializr.generator.base.SpringInitializrCodeGenerator;
+import ore.plugins.idea.spring.web.initializr.generator.base.SpringWebInitializrCodeGenerator;
 import ore.plugins.idea.spring.web.initializr.model.SpringWebInitializrRequest;
 import org.jetbrains.annotations.NotNull;
 
@@ -15,7 +15,7 @@ import java.util.stream.Collectors;
 
 import static ore.plugins.idea.utils.FormatUtils.*;
 
-public class ControllerGenerator extends SpringInitializrCodeGenerator implements TemplateReader {
+public class ControllerGenerator extends SpringWebInitializrCodeGenerator implements TemplateReader {
 
     private static final String RESOURCE_SERVICE_NAME_TEMPLATE = "%sResourceController";
     private static final String CONTROLLER_ANNOTATION_QN = "org.springframework.stereotype.Controller";
@@ -45,7 +45,7 @@ public class ControllerGenerator extends SpringInitializrCodeGenerator implement
 
     private PsiClass createResourceController(PsiDirectory psiDirectory) {
         String resourceControllerName = String.format(RESOURCE_SERVICE_NAME_TEMPLATE, springWebInitializrRequest.getResourceClass().getName());
-        PsiJavaFile resourceServiceFile = createJavaFileInDirectoryWithPackage(psiDirectory, resourceControllerName, springWebInitializrRequest.getResourceControllerPackage());
+        PsiJavaFile resourceControllerFile = createJavaFileInDirectoryWithPackage(psiDirectory, resourceControllerName, springWebInitializrRequest.getResourceControllerPackage());
 
         PsiClass resourceController = getElementFactory().createClass(resourceControllerName);
         addQualifiedAnnotationNameTo(CONTROLLER_ANNOTATION_QN, resourceController);
@@ -63,7 +63,7 @@ public class ControllerGenerator extends SpringInitializrCodeGenerator implement
         setupConvertMethods(resourceController);
 
         getJavaCodeStyleManager().shortenClassReferences(resourceController);
-        resourceServiceFile.add(resourceController);
+        resourceControllerFile.add(resourceController);
 
         return resourceController;
     }
@@ -186,9 +186,9 @@ public class ControllerGenerator extends SpringInitializrCodeGenerator implement
     }
 
     private void setupConstructor(PsiClass resourceController) {
-        PsiField resourceServiceElement = getElementFactory().createField(toFirstLetterLowerCase(Objects.requireNonNull(this.resourceService.getName())), getElementFactory().createType(this.resourceService));
-        PsiUtil.setModifierProperty(resourceServiceElement, PsiModifier.PRIVATE, true);
-        PsiUtil.setModifierProperty(resourceServiceElement, PsiModifier.FINAL, true);
+        PsiField resourceServiceElement = getElementFactory().createFieldFromText(String.format("private final %s.%s %s;", springWebInitializrRequest.getResourceServicePackage(), resourceService.getName(),
+                toFirstLetterLowerCase(Objects.requireNonNull(resourceService.getName()))), resourceService.getContext());
+
 
         List<PsiField> constructorArguments = Collections.singletonList(resourceServiceElement);
         List<String> superArguments = constructorArguments

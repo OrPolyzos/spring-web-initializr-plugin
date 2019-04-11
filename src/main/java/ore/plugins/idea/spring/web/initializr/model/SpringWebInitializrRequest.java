@@ -2,9 +2,6 @@ package ore.plugins.idea.spring.web.initializr.model;
 
 import com.intellij.psi.PsiClass;
 import com.intellij.psi.PsiField;
-import com.intellij.psi.util.PsiTypesUtil;
-
-import java.util.Objects;
 
 public class SpringWebInitializrRequest {
 
@@ -18,7 +15,7 @@ public class SpringWebInitializrRequest {
     private String resourceRepositoryPackage = "";
     private String resourceServicePackage = "";
     private String resourceControllerPackage = "";
-
+    private String resourceIdQualifiedName;
 
     private SpringWebInitializrRequest(PsiClass resourceClass, PsiField resourceIdPsiField) {
         this.resourceClass = resourceClass;
@@ -84,7 +81,11 @@ public class SpringWebInitializrRequest {
     }
 
     public String getResourceIdQualifiedName() {
-        return Objects.requireNonNull(PsiTypesUtil.getPsiClass(resourceIdPsiField.getType())).getQualifiedName();
+        return resourceIdQualifiedName;
+    }
+
+    public void setResourceIdQualifiedName(String resourceIdQualifiedName) {
+        this.resourceIdQualifiedName = resourceIdQualifiedName;
     }
 
     public static class SpringWebInitializrRequestBuilder {
@@ -137,6 +138,7 @@ public class SpringWebInitializrRequest {
             springWebInitializrRequest.setResourceRepositoryPackage(resourceRepositoryPackage);
             springWebInitializrRequest.setResourceServicePackage(resourceServicePackage);
             springWebInitializrRequest.setResourceControllerPackage(resourceControllerPackage);
+            springWebInitializrRequest.setResourceIdQualifiedName(resourceIdPsiField.getType().getCanonicalText());
             return springWebInitializrRequest;
         }
     }

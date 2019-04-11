@@ -5,10 +5,10 @@ import com.intellij.psi.PsiClass;
 import com.intellij.psi.PsiDirectory;
 import com.intellij.psi.PsiJavaFile;
 import ore.plugins.idea.base.functionality.TemplateReader;
-import ore.plugins.idea.spring.web.initializr.generator.base.SpringInitializrCodeGenerator;
+import ore.plugins.idea.spring.web.initializr.generator.base.SpringWebInitializrCodeGenerator;
 import ore.plugins.idea.spring.web.initializr.model.SpringWebInitializrRequest;
 
-public class RepositoryGenerator extends SpringInitializrCodeGenerator implements TemplateReader {
+public class RepositoryGenerator extends SpringWebInitializrCodeGenerator implements TemplateReader {
 
     private static final String RESOURCE_REPOSITORY_NAME_TEMPLATE = "%sResourceRepository";
     private static final String REPOSITORY_ANNOTATION_QN = "org.springframework.stereotype.Repository";
@@ -36,12 +36,12 @@ public class RepositoryGenerator extends SpringInitializrCodeGenerator implement
         String crudRepositoryQn = String.format("org.springframework.data.repository.CrudRepository<%s,%s>",
                 springWebInitializrRequest.getResourceClass().getQualifiedName(),
                 springWebInitializrRequest.getResourceIdQualifiedName());
+
         addQualifiedExtendsToClass(crudRepositoryQn, resourceRepository);
 
         getJavaCodeStyleManager().shortenClassReferences(resourceRepository);
         resourceRepositoryFile.add(resourceRepository);
         return resourceRepository;
     }
-
 
 }

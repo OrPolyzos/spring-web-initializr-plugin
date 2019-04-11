@@ -19,7 +19,7 @@ import java.util.Objects;
 
 public abstract class OrePluginAction extends AnAction implements ExceptionResolver {
 
-    protected static final Logger LOGGER = LoggerFactory.getLogger(OrePluginAction.class);
+    protected final Logger LOGGER = LoggerFactory.getLogger(OrePluginAction.class);
 
     @Override
     public void actionPerformed(@NotNull AnActionEvent anActionEvent) {

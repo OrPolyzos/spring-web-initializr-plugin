@@ -4,23 +4,29 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.dataformat.xml.XmlMapper;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.command.WriteCommandAction;
+import com.intellij.openapi.project.Project;
 import com.intellij.openapi.roots.ProjectRootManager;
 import com.intellij.openapi.ui.Messages;
+import com.intellij.psi.JavaPsiFacade;
 import com.intellij.psi.PsiClass;
 import com.intellij.psi.PsiField;
 import com.intellij.psi.PsiModifier;
+import com.intellij.psi.search.GlobalSearchScope;
 import ore.plugins.idea.action.OrePluginAction;
 import ore.plugins.idea.base.functionality.TemplateReader;
-import ore.plugins.idea.base.model.PsiPom;
+import ore.plugins.idea.base.model.pom.PsiPom;
 import ore.plugins.idea.dialog.InputValueDialog;
 import ore.plugins.idea.dialog.PackageInputDialog;
 import ore.plugins.idea.dialog.SelectStuffDialog;
 import ore.plugins.idea.exception.CancelException;
+import ore.plugins.idea.exception.validation.InvalidFileException;
 import ore.plugins.idea.exception.validation.InvalidStructureException;
 import ore.plugins.idea.exception.validation.ValidationException;
 import ore.plugins.idea.spring.web.initializr.generator.*;
+import ore.plugins.idea.spring.web.initializr.generator.base.SpringWebInitializrCodeGenerator;
 import ore.plugins.idea.spring.web.initializr.model.SpringWebInitializrRequest;
 import org.jetbrains.annotations.NotNull;
+import spring.web.initializr.base.domain.ResourcePersistable;
 
 import javax.swing.*;
 import java.io.File;
@@ -35,6 +41,19 @@ public class SpringWebInitializrAction extends OrePluginAction implements Templa
     private static final String POM_SAMPLE_TEMPLATE = "/templates/maven/pom-sample";
 
     @Override
+    public void update(@NotNull AnActionEvent anActionEvent) {
+        safeExecute(() -> {
+            super.update(anActionEvent);
+            PsiClass psiClass = extractPsiClass(anActionEvent);
+            if (psiClass.getImplementsList() != null
+                    && Arrays.stream(psiClass.getImplementsList().getReferencedTypes())
+                    .anyMatch(refType -> refType.getName().contains(ResourcePersistable.class.getSimpleName()))) {
+                throw new InvalidFileException();
+            }
+        }, anActionEvent, LOGGER);
+    }
+
+    @Override
     public void safeActionPerformed(AnActionEvent anActionEvent) {
         PsiClass resourcePsiClass = extractPsiClass(anActionEvent);
 
@@ -47,9 +66,9 @@ public class SpringWebInitializrAction extends OrePluginAction implements Templa
                 .withResourceFormClass(resourcePsiClass)
                 // TODO ADD SUPPORT FOR CUSTOM RESOURCE SEARCH FORM
                 .withResourceSearchFormClass(resourcePsiClass)
-                .withResourceRepositoryPackage(requestPackage(resourcePsiClass, String.format("Package for ResourceRepository (i.e. %sRepository)", resourcePsiClass.getName())))
-                .withResourceServicePackage(requestPackage(resourcePsiClass, String.format("Package for ResourceService (i.e. %sService)", resourcePsiClass.getName())))
-                .withResourceControllerPackage(requestPackage(resourcePsiClass, String.format("Package for ResourceController (i.e. %sController)", resourcePsiClass.getName())))
+                .withResourceRepositoryPackage(requestPackage(resourcePsiClass, String.format("Package for ResourceRepository (i.e. %sResourceRepository)", resourcePsiClass.getName()), "ResourceRepository"))
+                .withResourceServicePackage(requestPackage(resourcePsiClass, String.format("Package for ResourceService (i.e. %sResourceService)", resourcePsiClass.getName()), "ResourceService"))
+                .withResourceControllerPackage(requestPackage(resourcePsiClass, String.format("Package for ResourceController (i.e. %sResourceController)", resourcePsiClass.getName()), "ResourceController"))
                 .build();
 
         act(springWebInitializrRequest);
@@ -68,7 +87,10 @@ public class SpringWebInitializrAction extends OrePluginAction implements Templa
         ObjectMapper xmlMapper = new XmlMapper();
         try {
             PsiPom psiPom = xmlMapper.readValue(pom, PsiPom.class);
-            if (psiPom.getDependencies() == null || psiPom.getDependencies().stream().noneMatch(e -> e.getGroupId().equals("ore.utils.initializrs") && e.getArtifactId().equals("spring-web-initializr"))) {
+            if (psiPom.getDependencies() == null ||
+                    psiPom.getDependencies()
+                            .stream()
+                            .noneMatch(e -> e.getGroupId().equals("ore.utils.initializrs") && e.getArtifactId().equals("spring-web-initializr"))) {
                 Messages.showErrorDialog(getTemplate(SPRING_WEB_INITIALIZR_DEPENDENCY_TEMPLATE), "Insufficient Dependencies");
                 throw new CancelException();
             } else if (psiPom.getDependencies().stream().noneMatch(e -> e.getGroupId().contains("org.springframework.boot"))) {
@@ -84,14 +106,38 @@ public class SpringWebInitializrAction extends OrePluginAction implements Templa
     private PsiField requestResourceIdField(PsiClass resourcePsiClass) {
         SelectStuffDialog<PsiField> resourceIdFieldDialog = new SelectStuffDialog<>(resourcePsiClass, Arrays.asList(resourcePsiClass.getFields()), this::excludeStaticOrFinal, String.format("ID for Resource (i.e. %s)", resourcePsiClass.getName()), "Choose the field that is going to be the ID (primary key) for the Resource", ListSelectionModel.SINGLE_SELECTION);
         resourceIdFieldDialog.waitForInput();
-        return resourceIdFieldDialog.getSelectedStuff().stream().findFirst().orElseThrow(() -> new ValidationException(resourcePsiClass, "Invalid selection for the ID field."));
+        return resourceIdFieldDialog.getSelectedStuff()
+                .stream()
+                .findFirst()
+                .orElseThrow(() -> new ValidationException("Invalid selection for the ID field"));
     }
 
     @NotNull
-    private String requestPackage(PsiClass resourcePsiClass, String title) {
-        InputValueDialog packageInputDialog = new PackageInputDialog(resourcePsiClass, title, "Place in package (e.g. ore.swip.demo) or leave empty for default");
-        packageInputDialog.waitForInput();
-        return packageInputDialog.getInput();
+    private String requestPackage(PsiClass resourcePsiClass, String title, String suffix) {
+        String fullPackage;
+        do {
+            InputValueDialog packageInputDialog = new PackageInputDialog(resourcePsiClass, title, "Place in package (e.g. ore.swip.demo) or leave empty for default");
+            packageInputDialog.waitForInput();
+            fullPackage = packageInputDialog.getInput();
+        } while (!packageExistsAlready(fullPackage, resourcePsiClass.getProject())
+                || classExistsAlready(String.format("%s.%s%s", fullPackage, resourcePsiClass.getName(), suffix), resourcePsiClass.getProject()));
+        return fullPackage;
+    }
+
+    private boolean packageExistsAlready(String fullPackagePath, Project project) {
+        boolean packageExists = Files.exists(Paths.get(ProjectRootManager.getInstance(project).getContentRoots()[0].getPath().concat("/src/main/java/").concat(fullPackagePath.replaceAll("\\.", "/"))));
+        if (!packageExists) {
+            Messages.showWarningDialog("Package does not exist.", "Invalid Package");
+        }
+        return packageExists;
+    }
+
+    private boolean classExistsAlready(String qualifiedName, Project project) {
+        boolean existsAlready = JavaPsiFacade.getInstance(project).findClass(qualifiedName, GlobalSearchScope.allScope(project)) != null;
+        if (existsAlready) {
+            Messages.showWarningDialog(String.format("There is already a class %s.", qualifiedName), "Duplicate File");
+        }
+        return existsAlready;
     }
 
     private boolean excludeStaticOrFinal(PsiField psiField) {
@@ -101,12 +147,21 @@ public class SpringWebInitializrAction extends OrePluginAction implements Templa
     private void act(SpringWebInitializrRequest springWebInitializrRequest) {
         WriteCommandAction.runWriteCommandAction(springWebInitializrRequest.getResourceClass().getProject(), () -> {
 
-            new ResourcePersistableGenerator(springWebInitializrRequest).generate();
-            PsiClass resourceRepositoryClass = new RepositoryGenerator(springWebInitializrRequest).generate();
-            PsiClass resourceServiceClass = new ServiceGenerator(springWebInitializrRequest, resourceRepositoryClass).generate();
+            SpringWebInitializrCodeGenerator resourcePersistableGenerator = new ResourcePersistableGenerator(springWebInitializrRequest);
+            resourcePersistableGenerator.generate();
+
+            SpringWebInitializrCodeGenerator repositoryGenerator = new RepositoryGenerator(springWebInitializrRequest);
+            PsiClass resourceRepositoryClass = repositoryGenerator.generate();
+
+            SpringWebInitializrCodeGenerator serviceGenerator = new ServiceGenerator(springWebInitializrRequest, resourceRepositoryClass);
+            PsiClass resourceServiceClass = serviceGenerator.generate();
+
             ControllerGenerator controllerGenerator = new ControllerGenerator(springWebInitializrRequest, resourceServiceClass);
             controllerGenerator.generate();
-            new FreemarkerGenerator(springWebInitializrRequest, controllerGenerator).generate();
+
+            FreemarkerGenerator freemarkerGenerator = new FreemarkerGenerator(springWebInitializrRequest, controllerGenerator);
+            freemarkerGenerator.generate();
+
         });
     }
 

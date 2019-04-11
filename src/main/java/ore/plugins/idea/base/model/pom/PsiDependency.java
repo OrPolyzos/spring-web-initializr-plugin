@@ -1,4 +1,4 @@
-package ore.plugins.idea.base.model;
+package ore.plugins.idea.base.model.pom;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 

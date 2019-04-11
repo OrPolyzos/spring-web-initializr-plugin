@@ -8,7 +8,7 @@ import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.psi.*;
 import ore.plugins.idea.exception.validation.InvalidFileException;
 import ore.plugins.idea.exception.validation.InvalidStructureException;
-import ore.plugins.idea.spring.web.initializr.generator.base.SpringInitializrCodeGenerator;
+import ore.plugins.idea.spring.web.initializr.generator.base.SpringWebInitializrCodeGenerator;
 import ore.plugins.idea.spring.web.initializr.model.SpringWebInitializrRequest;
 import org.jetbrains.annotations.NotNull;
 
@@ -24,7 +24,7 @@ import java.util.stream.Collectors;
 
 import static ore.plugins.idea.utils.FormatUtils.*;
 
-public class FreemarkerGenerator extends SpringInitializrCodeGenerator {
+public class FreemarkerGenerator extends SpringWebInitializrCodeGenerator {
 
     private static final String BASE_RESOURCE_VIEW_TEMPLATE = "/templates/freemarker/base-resource-view";
     private static final String EDIT_RESOURCE_VIEW_TEMPLATE = "/templates/freemarker/edit-resource-view";
@@ -59,7 +59,7 @@ public class FreemarkerGenerator extends SpringInitializrCodeGenerator {
 
         createBaseResourceView(templates);
         createEditResourceView(templates);
-        return null;
+        return springWebInitializrRequest.getResourceClass();
     }
 
     private void createCssStylesFile(VirtualFile staticFolder) {
@@ -70,7 +70,7 @@ public class FreemarkerGenerator extends SpringInitializrCodeGenerator {
 
     private void createBaseResourceView(VirtualFile templates) {
         VirtualFile baseResourceView = createVirtualFileIfNotExists(springWebInitializrRequest.getResourceClass().getProject(), String.format("%s/%s.ftl", templates.getPath(), controllerGenerator.getResourceViewPath()), false);
-        List<PsiField> resourceFields = extractCandidateResourceFields(field -> true);
+        List<PsiField> resourceFields = extractCandidateResourceFields(field -> !field.equals(springWebInitializrRequest.getResourceIdPsiField()));
 
         String resourceFormContent = extractResourceFormContent(resourceFields);
 

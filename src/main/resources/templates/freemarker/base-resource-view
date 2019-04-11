@@ -55,7 +55,7 @@
     </div>
 </div>
 <div class="container-fluid">
-    <#if userList?has_content>
+    <#if %<resourceList>?has_content>
         <div class="panel panel-default">
             <div class="panel-heading"><a href="#results-resource-panel" data-toggle="collapse">Results</a></div>
             <div id="results-resource-panel" class="panel-body collapse in">
@@ -63,6 +63,7 @@
                     <table id="resource-table" class="table table-hover table-striped">
                         <thead>
                             <tr>
+                                <th>ID</th>
                                 %<resourceTableHeadContent>
                                 <th>Edit</th>
                                 <th>Delete</th>
@@ -71,16 +72,17 @@
                         <tbody>
                         <#list %<resourceList> as resource>
                             <tr>
+                                <td>${resource.resourcePersistableId!""}</td>
                                 %<resourceTableBodyContent>
                                 <td>
-                                    <form action="%<resourceBaseUri>/${resource.id}/edit" method="GET">
+                                    <form action="%<resourceBaseUri>/${resource.resourcePersistableId}/edit" method="GET">
                                         <button type="submit" class="btn btn-success">
                                             <span class="glyphicon glyphicon-cog"></span>
                                         </button>
                                     </form>
                                 </td>
                                 <td>
-                                    <form action="%<resourceBaseUri>/${resource.id}/delete" method="POST">
+                                    <form action="%<resourceBaseUri>/${resource.resourcePersistableId}/delete" method="POST">
                                         <button type="submit" class="btn btn-danger" onclick="return confirm('Are you sure?')">
                                             <span class="glyphicon glyphicon-remove"></span>
                                         </button>

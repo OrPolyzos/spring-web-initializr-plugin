@@ -16,7 +16,7 @@ public interface ExceptionResolver {
         } catch (InvalidFileException invalidFileException) {
             anActionEvent.getPresentation().setEnabled(false);
         } catch (ValidationException validationException) {
-            Messages.showMessageDialog(validationException.getPsiClass().getProject(), validationException.getMessage(), "Error", Messages.getErrorIcon());
+            Messages.showErrorDialog(validationException.getMessage(), "Error");
         } catch (CancelException ignored) {
         } catch (OrePluginRuntimeException exception) {
             logger.error(exception.getMessage());

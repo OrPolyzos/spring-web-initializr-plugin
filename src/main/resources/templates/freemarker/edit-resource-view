@@ -27,11 +27,11 @@
     <div class="panel panel-default">
         <div class="panel-heading"><a href="#edit-resource-panel" data-toggle="collapse">Edit</a></div>
         <div id="edit-resource-panel" class="panel-body collapse in">
-            <form action="%<resourceBaseUri>/${%<resourceForm>.id}/edit" method="POST" id="%<resourceForm>" name="%<resourceForm>">
+            <form action="%<resourceBaseUri>/${%<resourceForm>.resourcePersistableId}/edit" method="POST" id="%<resourceForm>" name="%<resourceForm>">
                 <div class="form-group">
                     <label for="id">ID</label>
-                    <@spring.bind "%<resourceForm>.id"/>
-                    <input type="text" class="form-control" id="id" name="id" value="${%<resourceForm>.id!""}" readonly/>
+                    <@spring.bind "%<resourceForm>.resourcePersistableId"/>
+                    <input type="text" class="form-control" id="id" name="id" value="${%<resourceForm>.resourcePersistableId!""}" readonly/>
                     <#list spring.status.errorMessages as error>
                         <span class="errorMessage">${error}</span>
                     </#list>

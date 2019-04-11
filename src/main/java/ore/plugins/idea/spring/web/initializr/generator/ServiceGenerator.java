@@ -4,15 +4,16 @@ import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.psi.*;
 import com.intellij.psi.util.PsiUtil;
 import ore.plugins.idea.base.functionality.TemplateReader;
-import ore.plugins.idea.spring.web.initializr.generator.base.SpringInitializrCodeGenerator;
+import ore.plugins.idea.spring.web.initializr.generator.base.SpringWebInitializrCodeGenerator;
 import ore.plugins.idea.spring.web.initializr.model.SpringWebInitializrRequest;
-import ore.plugins.idea.utils.FormatUtils;
 
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 
-public class ServiceGenerator extends SpringInitializrCodeGenerator implements TemplateReader {
+import static ore.plugins.idea.utils.FormatUtils.toFirstLetterLowerCase;
+
+public class ServiceGenerator extends SpringWebInitializrCodeGenerator implements TemplateReader {
 
     private static final String RESOURCE_SERVICE_NAME_TEMPLATE = "%sResourceService";
     private static final String SERVICE_ANNOTATION_QN = "org.springframework.stereotype.Service";
@@ -46,9 +47,7 @@ public class ServiceGenerator extends SpringInitializrCodeGenerator implements T
                 springWebInitializrRequest.getResourceIdQualifiedName());
         addQualifiedExtendsToClass(resourceServiceQualifiedName, resourceService);
 
-        PsiField resourceRepositoryElement = getElementFactory().createField(FormatUtils.toFirstLetterLowerCase(Objects.requireNonNull(resourceRepository.getName())), getElementFactory().createType(resourceRepository));
-        PsiUtil.setModifierProperty(resourceRepositoryElement, PsiModifier.PRIVATE, true);
-        PsiUtil.setModifierProperty(resourceRepositoryElement, PsiModifier.FINAL, true);
+        PsiField resourceRepositoryElement = getElementFactory().createFieldFromText(String.format("private final %s.%s %s;", springWebInitializrRequest.getResourceRepositoryPackage(), resourceRepository.getName(), toFirstLetterLowerCase(Objects.requireNonNull(resourceRepository.getName()))), resourceService.getContext());
 
         List<PsiField> constructorArguments = Collections.singletonList(resourceRepositoryElement);
 

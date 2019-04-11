@@ -19,7 +19,8 @@ public class InputValueDialog extends OrePluginDialog {
         JPanel jPanel = new JPanel();
         jbTextField = new JBTextField();
         jbTextField.setEditable(true);
-        jbTextField.setColumns(30);
+        jbTextField.setFocusable(true);
+        jbTextField.setColumns(40);
         jPanel.add(jbTextField);
         component = LabeledComponent.create(jPanel, componentText);
         showDialog();
