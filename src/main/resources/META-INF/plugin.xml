@@ -18,8 +18,8 @@
     </change-notes>
 
     <actions>
-        <action id="action-spring-web-initializr" class="ore.plugins.idea.spring.web.initializr.action.SpringWebInitializrAction"
-                text="Spring Web Initializr" description="Generates all">
+        <action id="action-spring-web-initializr" class="ore.plugins.idea.swip.action.SwipAction"
+                text="Swip" description="Generates everything">
             <add-to-group group-id="EditorPopupMenu" anchor="first"/>
         </action>
     </actions>
