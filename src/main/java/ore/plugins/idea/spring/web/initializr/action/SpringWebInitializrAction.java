@@ -25,11 +25,12 @@ import ore.plugins.idea.exception.validation.ValidationException;
 import ore.plugins.idea.spring.web.initializr.generator.*;
 import ore.plugins.idea.spring.web.initializr.generator.base.SpringWebInitializrCodeGenerator;
 import ore.plugins.idea.spring.web.initializr.model.SpringWebInitializrRequest;
+import ore.spring.web.initializr.domain.ResourcePersistable;
 import org.jetbrains.annotations.NotNull;
-import spring.web.initializr.base.domain.ResourcePersistable;
 
 import javax.swing.*;
 import java.io.File;
+import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.Arrays;
@@ -90,13 +91,11 @@ public class SpringWebInitializrAction extends OrePluginAction implements Templa
             if (psiPom.getDependencies() == null ||
                     psiPom.getDependencies()
                             .stream()
-                            .noneMatch(e -> e.getGroupId().equals("ore.utils.initializrs") && e.getArtifactId().equals("spring-web-initializr"))) {
+                            .noneMatch(e -> e.getGroupId().equals("io.github.orpolyzos") && e.getArtifactId().equals("spring-web-initializr"))) {
                 Messages.showErrorDialog(getTemplate(SPRING_WEB_INITIALIZR_DEPENDENCY_TEMPLATE), "Insufficient Dependencies");
                 throw new CancelException();
-            } else if (psiPom.getDependencies().stream().noneMatch(e -> e.getGroupId().contains("org.springframework.boot"))) {
-                Messages.showMessageDialog(getTemplate(POM_SAMPLE_TEMPLATE), "Insufficient Dependencies", Messages.getWarningIcon());
             }
-        } catch (Exception e) {
+        } catch (IOException e) {
             throw new InvalidStructureException(e.getMessage());
         }
 

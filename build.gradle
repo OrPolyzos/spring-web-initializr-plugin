@@ -50,7 +50,7 @@ repositories {
 }
 
 dependencies {
-    compile(group: 'ore.utils.initializrs', name: 'spring-web-initializr', version: '1.0.0') {
+    compile(group: 'io.github.orpolyzos', name: 'spring-web-initializr', version: '1.0.0') {
         exclude(group: 'org.slf4j')
     }
     compile group: 'com.fasterxml.jackson.dataformat', name: 'jackson-dataformat-xml', version: '2.9.8'

@@ -13,7 +13,7 @@ public class ResourcePersistableGenerator extends SpringWebInitializrCodeGenerat
 
     @Override
     public PsiClass generate() {
-        String resourcePersistableQualifiedName = String.format("spring.web.initializr.base.domain.ResourcePersistable<%s>", springWebInitializrRequest.getResourceIdQualifiedName());
+        String resourcePersistableQualifiedName = String.format("ore.spring.web.initializr.domain.ResourcePersistable<%s>", springWebInitializrRequest.getResourceIdQualifiedName());
         addQualifiedImplementsToClass(resourcePersistableQualifiedName, springWebInitializrRequest.getResourceClass());
         springWebInitializrRequest.getResourceClass().add(extractGetIdMethod());
         getJavaCodeStyleManager().shortenClassReferences(springWebInitializrRequest.getResourceClass());

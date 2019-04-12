@@ -164,7 +164,7 @@ public class FreemarkerGenerator extends SpringWebInitializrCodeGenerator {
 
     private void validateFileDoesNotExist(Project project, String path) {
         if (new File(path).exists()) {
-            Messages.showMessageDialog(project, String.format("There is already a directory '%s'. Aborting.", path), "Error", Messages.getErrorIcon());
+            Messages.showMessageDialog(project, String.format("There is already a directory '%s'. Skipping freemarker resources creation...", path), "Duplicate Freemarker Resources", Messages.getWarningIcon());
             throw new InvalidStructureException();
         }
     }

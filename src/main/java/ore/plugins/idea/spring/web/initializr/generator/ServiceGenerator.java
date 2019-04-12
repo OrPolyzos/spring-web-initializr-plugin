@@ -41,7 +41,7 @@ public class ServiceGenerator extends SpringWebInitializrCodeGenerator implement
         PsiClass resourceService = getElementFactory().createClass(resourceServiceName);
         addQualifiedAnnotationNameTo(SERVICE_ANNOTATION_QN, resourceService);
 
-        String resourceServiceQualifiedName = String.format("spring.web.initializr.base.service.ResourceService<%s,%s,%s>",
+        String resourceServiceQualifiedName = String.format("ore.spring.web.initializr.service.ResourceService<%s,%s,%s>",
                 springWebInitializrRequest.getResourceClass().getQualifiedName(),
                 springWebInitializrRequest.getResourceSearchFormClass().getQualifiedName(),
                 springWebInitializrRequest.getResourceIdQualifiedName());

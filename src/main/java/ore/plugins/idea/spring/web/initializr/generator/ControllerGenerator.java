@@ -50,7 +50,7 @@ public class ControllerGenerator extends SpringWebInitializrCodeGenerator implem
         PsiClass resourceController = getElementFactory().createClass(resourceControllerName);
         addQualifiedAnnotationNameTo(CONTROLLER_ANNOTATION_QN, resourceController);
 
-        String resourceControllerQualifiedName = String.format("spring.web.initializr.base.controller.ResourceController<%s, %s, %s, %s>",
+        String resourceControllerQualifiedName = String.format("ore.spring.web.initializr.controller.ResourceController<%s, %s, %s, %s>",
                 springWebInitializrRequest.getResourceClass().getQualifiedName(),
                 springWebInitializrRequest.getResourceIdQualifiedName(),
                 springWebInitializrRequest.getResourceFormClass().getQualifiedName(),
