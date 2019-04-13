@@ -1,16 +1,14 @@
-### Gradle ###
-gradlew
-gradlew.bat
-/.gradle/
-/gradle/
-/build/
-
 ### IntelliJ IDEA ###
 .idea
 *.iml
 *.iws
 *.ipr
-*.md
 *.jar
-/target/
-/out/
+
+### Gradle ###
+.gradle
+gradle/
+gradlew
+gradlew.bat
+/build/
+gradle.properties

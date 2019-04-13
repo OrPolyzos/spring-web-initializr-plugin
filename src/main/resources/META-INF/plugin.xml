@@ -1,19 +1,34 @@
 <idea-plugin>
     <id>spring.web.initializr.plugin</id>
-    <name>Spring Web Initializr</name>
+    <name>Swip (Spring Web Initializr)</name>
     <vendor email="orestes.polyzos@gmail.com" url="https://www.linkedin.com/in/orestes-polyzos/">Orestes Polyzos</vendor>
 
     <idea-version since-build="145.20" until-build="191.*"/>
 
     <description>
         <![CDATA[
-            Some description should be placed here about the purpose of the plugin.
+            <h1>Create a fully functional (Spring Boot) WebApp with just a few clicks</h1>
+            <p>
+                Swip will generate all the files required for a functional web application based on your domain classes.
+                It is based on the <em>convention over configuration</em> paradigm, so during the generation phase the actual
+                configuration is limited, but after the files have been generated they can obviously be configured/changed as needed.
+            </p>
+            <h4>How To</h4>
+            <ol>
+                <li>Create a Java class for your entity (e.g. User) with all its' desired fields (e.g. firstName, lastName, etc...)</li>
+                <li>Right-click inside the class to get the editor menu</li>
+                <li>Click the `Swip` option and follow the instructions
+            </ol>
+            <hr/>
+            <p>
+                Swip is an open-source project. You can get more information on its' <a href="https://github.com/OrPolyzos/spring-web-initializr-plugin">Github Repo</a>
+            </p>
         ]]>
     </description>
 
     <change-notes>
         <![CDATA[
-            Release notes should go here about the current version and the previous ones.
+            Swip will generate all the code required for a functional WebApp based on your domain classes
         ]]>
     </change-notes>
 

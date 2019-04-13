@@ -23,8 +23,14 @@ plugins {
 apply plugin: 'java'
 apply plugin: 'org.jetbrains.intellij'
 
+intellij {
+    // Comment in to test on the specific version
+    version 'IC-141.712.1'
+    updateSinceUntilBuild false
+}
+
 group 'ore.plugins.idea'
-version '0.0.1'
+version '1.0.0'
 
 sourceCompatibility = javaVersion
 targetCompatibility = javaVersion
@@ -38,8 +44,7 @@ intellij {
 }
 
 publishPlugin {
-    username publishUsername
-    password publishPassword
+    token publishToken
     channels publishChannels.split(',')
     host publishHost
 }
