@@ -44,4 +44,8 @@
             <add-to-group group-id="EditorPopupMenu" anchor="first"/>
         </action>
     </actions>
+
+    <depends>com.intellij.modules.java</depends>
+    <depends>com.intellij.modules.idea</depends>
+
 </idea-plugin>
