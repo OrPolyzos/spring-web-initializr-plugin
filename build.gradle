@@ -25,7 +25,7 @@ apply plugin: 'org.jetbrains.intellij'
 
 intellij {
     // Comment in to test on the specific version
-    version 'IC-141.712.1'
+    version 'IC-172.3757.5'
     updateSinceUntilBuild false
 }
 

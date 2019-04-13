@@ -46,7 +46,11 @@ public class ServiceGenerator extends SwipJavaCodeGenerator {
                 swipRequest.getResourceIdQualifiedName());
         addQualifiedExtendsToClass(resourceServiceQualifiedName, resourceService);
 
-        PsiField resourceRepositoryElement = getElementFactory().createFieldFromText(String.format("private final %s.%s %s;", swipRequest.getResourceRepositoryPackage(), resourceRepository.getName(), toFirstLetterLowerCase(Objects.requireNonNull(resourceRepository.getName()))), resourceService.getContext());
+        String qualifiedRepositoryName = resourceRepository.getName();
+        if (swipRequest.getResourceRepositoryPackage().length() > 0) {
+            qualifiedRepositoryName = swipRequest.getResourceRepositoryPackage().concat(".").concat(Objects.requireNonNull(qualifiedRepositoryName));
+        }
+        PsiField resourceRepositoryElement = getElementFactory().createFieldFromText(String.format("private final %s %s;", qualifiedRepositoryName, toFirstLetterLowerCase(Objects.requireNonNull(resourceRepository.getName()))), resourceService.getContext());
 
         List<PsiField> constructorArguments = Collections.singletonList(resourceRepositoryElement);
 

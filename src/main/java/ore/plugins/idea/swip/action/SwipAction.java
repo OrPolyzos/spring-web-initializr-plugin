@@ -48,7 +48,7 @@ public class SwipAction extends OrePluginAction {
             PsiClass psiClass = extractPsiClass(anActionEvent);
             if (psiClass.getImplementsList() != null
                     && Arrays.stream(psiClass.getImplementsList().getReferencedTypes())
-                    .anyMatch(refType -> refType.getName().contains(ResourcePersistable.class.getSimpleName()))) {
+                    .anyMatch(refType -> refType.getClassName().contains(ResourcePersistable.class.getSimpleName()))) {
                 throw new InvalidFileException();
             }
         }, anActionEvent);

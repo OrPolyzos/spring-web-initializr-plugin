@@ -185,7 +185,11 @@ public class ControllerGenerator extends SwipJavaCodeGenerator {
     }
 
     private void setupConstructor(PsiClass resourceController) {
-        PsiField resourceServiceElement = getElementFactory().createFieldFromText(String.format("private final %s.%s %s;", swipRequest.getResourceServicePackage(), resourceService.getName(),
+        String qualifiedServiceName = resourceService.getName();
+        if (swipRequest.getResourceServicePackage().length() > 0) {
+            qualifiedServiceName = swipRequest.getResourceServicePackage().concat(".").concat(Objects.requireNonNull(qualifiedServiceName));
+        }
+        PsiField resourceServiceElement = getElementFactory().createFieldFromText(String.format("private final %s %s;", qualifiedServiceName,
                 toFirstLetterLowerCase(Objects.requireNonNull(resourceService.getName()))), resourceService.getContext());
 
 
