@@ -1,9 +1,0 @@
-
-                            <div class="form-group">
-                                <label for="%<resourceFieldNameLowerCase>">%<resourceFieldNameUpperCase></label>
-                                <@spring.bind "%<resourceForm>.%<resourceFieldName>"/>
-                                <input type="text" class="form-control" id="%<resourceFieldNameLowerCase>" name="%<resourceFieldName>" value="${%<resourceForm>.%<resourceFieldName>!""}"/>
-                                <#list spring.status.errorMessages as error>
-                                    <span class="errorMessage">${error}</span>
-                                </#list>
-                            </div>
