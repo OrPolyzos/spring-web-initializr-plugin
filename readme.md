@@ -2,6 +2,10 @@
 * Create a fully functional (Spring Boot) WebApp with just a few clicks
 * Reduce the boilerplate code
 
+## Demonstration
+![Demo gif](/../screenshots/swip-demo.gif?raw=true)
+
+
 ## How To
 1) Create a Java class for your entity (e.g. User) with all its' desired fields (e.g. firstName, lastName, etc...)
 2) Right click inside the class to get the editor menu
@@ -139,12 +143,9 @@ public class User {
 ```
 </details>
 
-## Demonstration
-![Demo gif](/../screenshots/swip-demo.gif?raw=true)
-
 ## Prerequisites
 
-__spring-web-initializr__
+__spring-web-initializr__ (https://github.com/OrPolyzos/spring-web-initializr)
 
 In order to avoid duplicate code a separate library has been developed, that is being used by Swip.
 As such, the following dependency is mandatory and should be added to your pom.xml
