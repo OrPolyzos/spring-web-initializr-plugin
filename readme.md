@@ -46,10 +46,6 @@ Below are some samples to get you started.
             <version>1.0.0</version>
         </dependency>
         <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-jdbc</artifactId>
-        </dependency>
-        <dependency>
             <groupId>com.h2database</groupId>
             <artifactId>h2</artifactId>
             <scope>runtime</scope>
@@ -143,8 +139,12 @@ public class User {
 ```
 </details>
 
+## Demonstration
+![Demo gif](/../screenshots/swip-demo.gif?raw=true)
+
 ## Prerequisites
-spring-web-initializr
+
+__spring-web-initializr__
 
 In order to avoid duplicate code a separate library has been developed, that is being used by Swip.
 As such, the following dependency is mandatory and should be added to your pom.xml
