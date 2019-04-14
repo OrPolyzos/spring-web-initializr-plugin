@@ -144,7 +144,6 @@ public class User {
 </details>
 
 ## Prerequisites
-
 __spring-web-initializr__ (https://github.com/OrPolyzos/spring-web-initializr)
 
 In order to avoid duplicate code a separate library has been developed, that is being used by Swip.
@@ -156,6 +155,13 @@ As such, the following dependency is mandatory and should be added to your pom.x
     <version>1.0.0</version>
 </dependency>
 ```
+
+## Release History
+* <strong>1.0.0</strong>
+    * Adds support for Maven
+    * Adds support for spring-boot-starter-web
+    * Adds support for spring-boot-starter-data-jpa
+    * Adds support for spring-boot-starter-freemarker
 
 ## Description
 Swip will generate all the code required for a functional WebApp based on your domain classes. 
@@ -195,3 +201,7 @@ Based on the provided ResourceController, the ResourceService should be able to:
 * insert(Resource) -> searches for duplicate Resources and throws a DuplicateResourceException if found, or else saves the Resource
 * update(Resource) -> searches for the specific Resource and updates it if found, or else throws a ResourceNotFoundException
 * searchBy(ResourceSearchForm) -> searches for Resources based on a  ResourceSearchForm and returns an Iterable<Resource> (by default returns findAll())
+
+
+## Authors
+* [**Orestes Polyzos**](https://github.com/OrPolyzos) - *Initial work*
