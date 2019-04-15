@@ -3,7 +3,7 @@
     <name>Swip (Spring Web Initializr)</name>
     <vendor email="orestes.polyzos@gmail.com" url="https://www.linkedin.com/in/orestes-polyzos/">Orestes Polyzos</vendor>
 
-    <idea-version since-build="172.3757.5" until-build="191.*"/>
+    <idea-version since-build="171.4424.54" until-build="191.*"/>
 
     <description>
         <![CDATA[
@@ -28,12 +28,23 @@
 
     <change-notes>
         <![CDATA[
-            <strong>1.0.0</strong> - First release
             <ul>
-                <li>Adds support for Maven</li>
-                <li>Adds support for spring-boot-starter-web</li>
-                <li>Adds support for spring-boot-starter-data-jpa</li>
-                <li>Adds support for spring-boot-starter-freemarker</li>
+                <li>
+                    <strong>1.1.0</strong>
+                    <ul>
+                        <li>Adds support for spring-boot-starter-parent from version '1.5.20.RELEASE' up to LATEST</li>
+                        <li>Adds support for older IntelliJ IDEA since build '171.4424.54'</li>
+                    </ul>
+                </li>
+                <li>
+                    <strong>1.0.0</strong> - First release
+                    <ul>
+                        <li>Adds support/dependency for Maven</li>
+                        <li>Adds support for spring-boot-starter-web</li>
+                        <li>Adds support for spring-boot-starter-data-jpa</li>
+                        <li>Adds support for spring-boot-starter-freemarker</li>
+                    </ul>
+                </li>
             </ul>
         ]]>
     </change-notes>
@@ -44,8 +55,5 @@
             <add-to-group group-id="EditorPopupMenu" anchor="first"/>
         </action>
     </actions>
-
-    <depends>com.intellij.modules.java</depends>
-    <depends>com.intellij.modules.idea</depends>
 
 </idea-plugin>

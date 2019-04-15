@@ -185,11 +185,13 @@ public class ControllerGenerator extends SwipJavaCodeGenerator {
     }
 
     private void setupConstructor(PsiClass resourceController) {
-        String qualifiedServiceName = resourceService.getName();
-        if (swipRequest.getResourceServicePackage().length() > 0) {
-            qualifiedServiceName = swipRequest.getResourceServicePackage().concat(".").concat(Objects.requireNonNull(qualifiedServiceName));
-        }
-        PsiField resourceServiceElement = getElementFactory().createFieldFromText(String.format("private final %s %s;", qualifiedServiceName,
+
+        String qualifiedResourceServiceName = String.format("ore.spring.web.initializr.service.ResourceService<%s,%s,%s>",
+                swipRequest.getResourceClass().getQualifiedName(),
+                swipRequest.getResourceFormClass().getQualifiedName(),
+                swipRequest.getResourceIdQualifiedName());
+
+        PsiField resourceServiceElement = getElementFactory().createFieldFromText(String.format("private final %s %s;", qualifiedResourceServiceName,
                 toFirstLetterLowerCase(Objects.requireNonNull(resourceService.getName()))), resourceService.getContext());
 
 

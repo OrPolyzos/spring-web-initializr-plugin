@@ -4,5 +4,5 @@ Please add it into the pom.xml and try again.
         <dependency>
             <groupId>io.github.orpolyzos</groupId>
             <artifactId>spring-web-initializr</artifactId>
-            <version>1.0.0</version>
+            <version>1.1.0</version>
         </dependency>

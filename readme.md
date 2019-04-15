@@ -47,7 +47,7 @@ Below are some samples to get you started.
         <dependency>
             <groupId>io.github.orpolyzos</groupId>
             <artifactId>spring-web-initializr</artifactId>
-            <version>1.0.0</version>
+            <version>1.1.0</version>
         </dependency>
         <dependency>
             <groupId>com.h2database</groupId>
@@ -144,6 +144,7 @@ public class User {
 </details>
 
 ## Prerequisites
+
 __spring-web-initializr__ (https://github.com/OrPolyzos/spring-web-initializr)
 
 In order to avoid duplicate code a separate library has been developed, that is being used by Swip.
@@ -152,12 +153,16 @@ As such, the following dependency is mandatory and should be added to your pom.x
 <dependency>
     <groupId>io.github.orpolyzos</groupId>
     <artifactId>spring-web-initializr</artifactId>
-    <version>1.0.0</version>
+    <version>1.1.0</version>
 </dependency>
 ```
 
 ## Release History
-* <strong>1.0.0</strong>
+* <strong>1.1.0</strong>
+    * Adds support for spring-boot-starter-parent from version '1.5.20.RELEASE' up to LATEST
+    * Adds support for older IntelliJ IDEA since build '171.4424.54'
+
+* <strong>1.0.0</strong> - First Release
     * Adds support for Maven
     * Adds support for spring-boot-starter-web
     * Adds support for spring-boot-starter-data-jpa

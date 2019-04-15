@@ -20,7 +20,7 @@ public class SelectStuffDialog<T> extends OrePluginDialog {
     private ListCellRenderer<? super T> listCellRenderer;
 
     private LabeledComponent<JPanel> labeledComponent;
-    private JBList<T> optionsJbList;
+    private JBList optionsJbList;
 
     public SelectStuffDialog(Project project, String title, String message, Collection<T> optionsList, int listSelectionModel) {
         super(project);
@@ -52,7 +52,7 @@ public class SelectStuffDialog<T> extends OrePluginDialog {
     }
 
     private void setupOptionsJbList() {
-        optionsJbList = new JBList<>(new CollectionListModel<>(optionsList));
+        optionsJbList = new JBList(new CollectionListModel<>(optionsList));
         optionsJbList.setSelectionMode(listSelectionModel);
         if (listCellRenderer != null) {
             optionsJbList.setCellRenderer(listCellRenderer);
@@ -72,6 +72,7 @@ public class SelectStuffDialog<T> extends OrePluginDialog {
         labeledComponent = LabeledComponent.create(toolbarDecorator.createPanel(), message);
     }
 
+    @SuppressWarnings("unchecked")
     public List<T> getSelectedStuff() {
         return optionsJbList.getSelectedValuesList();
     }
