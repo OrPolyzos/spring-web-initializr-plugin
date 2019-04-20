@@ -5,6 +5,8 @@
 ## Demonstration
 ![Demo gif](/../screenshots/swip-demo.gif?raw=true)
 
+## Download
+Get it through IntelliJ IDEA by writing *Swip* (Spring Web Initializr Plugin) or else through the [Jetbrains Repo](https://plugins.jetbrains.com/plugin/12239-swip-spring-web-initializr)
 
 ## How To
 1) Create a Java class for your entity (e.g. User) with all its' desired fields (e.g. firstName, lastName, etc...)
