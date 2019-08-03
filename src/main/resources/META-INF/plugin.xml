@@ -3,7 +3,7 @@
     <name>Swip (Spring Web Initializr)</name>
     <vendor email="orestes.polyzos@gmail.com" url="https://www.linkedin.com/in/orestes-polyzos/">Orestes Polyzos</vendor>
 
-    <idea-version since-build="171.4424.54" until-build="191.*"/>
+    <idea-version since-build="171.4424.54" until-build="192.*"/>
 
     <description>
         <![CDATA[
@@ -30,6 +30,12 @@
         <![CDATA[
             <ul>
                 <li>
+                    <strong>1.1.1</strong>
+                    <ul>
+                        <li>Adds support for IntelliJ IDEA until build '192.*'</li>
+                    </ul>
+                </li>
+                <li>
                     <strong>1.1.0</strong>
                     <ul>
                         <li>Adds support for spring-boot-starter-parent from version '1.5.20.RELEASE' up to LATEST</li>
@@ -48,6 +54,13 @@
             </ul>
         ]]>
     </change-notes>
+
+    <depends>com.intellij.modules.lang</depends>
+    <depends>com.intellij.modules.java</depends>
+    <depends>com.intellij.modules.ultimate</depends>
+    <depends>com.intellij.modules.idea</depends>
+    <depends>com.intellij.modules.idea.ultimate</depends>
+
 
     <actions>
         <action id="action-spring-web-initializr" class="ore.plugins.idea.swip.action.SwipAction"
