@@ -9,7 +9,7 @@ public abstract class SwipJavaCodeGenerator extends JavaCodeGenerator {
     protected SwipRequest swipRequest;
 
     public SwipJavaCodeGenerator(SwipRequest swipRequest) {
-        super(swipRequest.getResourceClass());
+        super(swipRequest.getResourcePersistableClass());
         this.swipRequest = swipRequest;
     }
 

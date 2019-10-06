@@ -51,6 +51,7 @@ public class SelectStuffDialog<T> extends OrePluginDialog {
         setupLabeledComponent();
     }
 
+    @SuppressWarnings("unchecked")
     private void setupOptionsJbList() {
         optionsJbList = new JBList(new CollectionListModel<>(optionsList));
         optionsJbList.setSelectionMode(listSelectionModel);

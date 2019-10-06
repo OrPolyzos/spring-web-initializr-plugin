@@ -207,7 +207,7 @@ Based on the provided ResourceController, the ResourceService should be able to:
 * findAll() -> searches for all Resources and returns an Iterable<Resource>
 * insert(Resource) -> searches for duplicate Resources and throws a DuplicateResourceException if found, or else saves the Resource
 * update(Resource) -> searches for the specific Resource and updates it if found, or else throws a ResourceNotFoundException
-* searchBy(ResourceSearchForm) -> searches for Resources based on a  ResourceSearchForm and returns an Iterable<Resource> (by default returns findAll())
+* searchBy(resourcePersistableSearchForm) -> searches for Resources based on a  resourcePersistableSearchForm and returns an Iterable<Resource> (by default returns findAll())
 
 
 ## Authors

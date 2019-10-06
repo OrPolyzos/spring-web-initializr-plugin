@@ -64,12 +64,12 @@ public class SwipAction extends OrePluginAction {
         SwipRequest swipRequest = SwipRequest.SwipRequestBuilder
                 .aSwipRequest(resourcePsiClass, requestResourceIdField(resourcePsiClass))
                 // TODO ADD SUPPORT FOR CUSTOM RESOURCE FORM
-                .withResourceFormClass(resourcePsiClass)
+                .withResourcePersistableFormClass(resourcePsiClass)
                 // TODO ADD SUPPORT FOR CUSTOM RESOURCE SEARCH FORM
-                .withResourceSearchFormClass(resourcePsiClass)
-                .withResourceRepositoryPackage(requestPackage(resourcePsiClass, String.format("Package for ResourceRepository (i.e. %sResourceRepository)", resourcePsiClass.getName()), "ResourceRepository"))
-                .withResourceServicePackage(requestPackage(resourcePsiClass, String.format("Package for ResourceService (i.e. %sResourceService)", resourcePsiClass.getName()), "ResourceService"))
-                .withResourceControllerPackage(requestPackage(resourcePsiClass, String.format("Package for ResourceController (i.e. %sResourceController)", resourcePsiClass.getName()), "ResourceController"))
+                .withResourcePersistableSearchFormClass(resourcePsiClass)
+                .withResourcePersistableRepositoryPackage(requestPackage(resourcePsiClass, String.format("Package for ResourcePersistableRepository (i.e. %sResourcePersistableRepository)", resourcePsiClass.getName()), "ResourcePersistableRepository"))
+                .withResourcePersistableServicePackage(requestPackage(resourcePsiClass, String.format("Package for ResourcePersistableService (i.e. %sResourcePersistableService)", resourcePsiClass.getName()), "ResourcePersistableService"))
+                .withResourcePersistableControllerPackage(requestPackage(resourcePsiClass, String.format("Package for ResourcePersistableController (i.e. %sResourcePersistableController)", resourcePsiClass.getName()), "ResourcePersistableController"))
                 .build();
 
         act(swipRequest);
@@ -108,14 +108,14 @@ public class SwipAction extends OrePluginAction {
                 .collect(Collectors.toList());
         SelectStuffDialog<PsiField> resourceIdFieldDialog = new SelectStuffDialog<>(
                 resourcePsiClass.getProject(),
-                String.format("ID for Resource (i.e. %s)", resourcePsiClass.getName()),
+                String.format("ResourcePersistable ID: (i.e. %s)", resourcePsiClass.getName()),
                 "Choose the field that is going to be the ID (primary key) for the Resource",
                 resourceIdCandidates, ListSelectionModel.SINGLE_SELECTION, new NameListCelRenderer());
         resourceIdFieldDialog.waitForInput();
         return resourceIdFieldDialog.getSelectedStuff()
                 .stream()
                 .findFirst()
-                .orElseThrow(() -> new ValidationException("Invalid selection for the ID field"));
+                .orElseThrow(() -> new ValidationException("Invalid selection for the ResourcePersistable ID"));
     }
 
     @NotNull
@@ -151,21 +151,18 @@ public class SwipAction extends OrePluginAction {
     }
 
     private void act(SwipRequest swipRequest) {
-        WriteCommandAction.runWriteCommandAction(swipRequest.getResourceClass().getProject(), () -> {
+        WriteCommandAction.runWriteCommandAction(swipRequest.getResourcePersistableClass().getProject(), () -> {
 
             new ResourcePersistableGenerator(swipRequest).generateJavaClass();
 
-            PsiClass resourceRepositoryClass = new RepositoryGenerator(swipRequest).generateJavaClass();
+            PsiClass resourceRepositoryClass = new ResourcePersistableRepositoryGenerator(swipRequest).generateJavaClass();
 
-            PsiClass resourceServiceClass = new ServiceGenerator(swipRequest, resourceRepositoryClass).generateJavaClass();
+            PsiClass resourceServiceClass = new ResourcePersistableServiceGenerator(swipRequest, resourceRepositoryClass).generateJavaClass();
 
-            ControllerGenerator controllerGenerator = new ControllerGenerator(swipRequest, resourceServiceClass);
+            ResourcePersistableControllerGenerator controllerGenerator = new ResourcePersistableControllerGenerator(swipRequest, resourceServiceClass);
             controllerGenerator.generateJavaClass();
 
-            FreemarkerGenerator freemarkerGenerator = new FreemarkerGenerator(swipRequest, controllerGenerator);
-            freemarkerGenerator.generateResources();
-
-        });
+            new FreemarkerGenerator(swipRequest, controllerGenerator).generateResources(); });
     }
 
 

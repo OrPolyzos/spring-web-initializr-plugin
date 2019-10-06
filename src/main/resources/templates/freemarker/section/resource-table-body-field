@@ -1,2 +1,2 @@
 
-                <td>${resource.%<resourceFieldNameLowerCase>!""}</td>
+                <td>${resource.%<resourcePersistableFieldNameLowerCase>!""}</td>

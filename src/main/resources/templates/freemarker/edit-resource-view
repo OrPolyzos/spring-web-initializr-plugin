@@ -1,7 +1,7 @@
 <#import "/spring.ftl" as spring/>
 <html>
 <head>
-    <title>%<editResourceViewTitle></title>
+    <title>%<editResourcePersistableViewTitle></title>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.0/css/bootstrap.min.css">
@@ -12,7 +12,7 @@
 <body>
 <div class="container">
     <div class="page-header">
-        <h1>%<editResourceViewTitle></h1>
+        <h1>%<editResourcePersistableViewTitle></h1>
     </div>
     <#if infoMessage??>
         <div class="panel panel-default">
@@ -27,16 +27,16 @@
     <div class="panel panel-default">
         <div class="panel-heading"><a href="#edit-resource-panel" data-toggle="collapse">Edit</a></div>
         <div id="edit-resource-panel" class="panel-body collapse in">
-            <form action="%<resourceBaseUri>/${%<resourceForm>.resourcePersistableId}/edit" method="POST" id="%<resourceForm>" name="%<resourceForm>">
+            <form action="%<resourcePersistableBaseUri>/${%<resourcePersistableForm>.resourcePersistableId}/edit" method="POST" id="%<resourcePersistableForm>" name="%<resourcePersistableForm>">
                 <div class="form-group">
                     <label for="id">ID</label>
-                    <@spring.bind "%<resourceForm>.resourcePersistableId"/>
-                    <input type="text" class="form-control" id="id" name="id" value="${%<resourceForm>.resourcePersistableId!""}" readonly/>
+                    <@spring.bind "%<resourcePersistableForm>.resourcePersistableId"/>
+                    <input type="text" class="form-control" id="id" name="id" value="${%<resourcePersistableForm>.resourcePersistableId!""}" readonly/>
                     <#list spring.status.errorMessages as error>
                         <span class="errorMessage">${error}</span>
                     </#list>
                 </div>
-                %<resourceFormContent>
+                %<resourcePersistableFormContent>
                 <div class="col-12 controls">
                     <span>
                         <button type="submit" id="btn-submit" class="btn btn-success btn-md">Submit</button>

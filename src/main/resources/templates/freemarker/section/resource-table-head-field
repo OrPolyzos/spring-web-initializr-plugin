@@ -1,2 +1,2 @@
 
-                <th>%<resourceFieldNameUpperCase></th>
+                <th>%<resourcePersistableFieldNameUpperCase></th>

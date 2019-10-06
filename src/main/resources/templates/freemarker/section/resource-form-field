@@ -1,8 +1,8 @@
 
                             <div class="form-group">
-                                <label for="%<resourceFieldNameLowerCase>">%<resourceFieldNameUpperCase></label>
-                                <@spring.bind "%<resourceForm>.%<resourceFieldName>"/>
-                                <input type="text" class="form-control" id="%<resourceFieldNameLowerCase>" name="%<resourceFieldName>" value="${%<resourceForm>.%<resourceFieldName>!""}"/>
+                                <label for="%<resourcePersistableFieldNameLowerCase>">%<resourcePersistableFieldNameUpperCase></label>
+                                <@spring.bind "%<resourcePersistableForm>.%<resourcePersistableFieldName>"/>
+                                <input type="text" class="form-control" id="%<resourcePersistableFieldNameLowerCase>" name="%<resourcePersistableFieldName>" value="${%<resourcePersistableForm>.%<resourcePersistableFieldName>!""}"/>
                                 <#list spring.status.errorMessages as error>
                                     <span class="errorMessage">${error}</span>
                                 </#list>

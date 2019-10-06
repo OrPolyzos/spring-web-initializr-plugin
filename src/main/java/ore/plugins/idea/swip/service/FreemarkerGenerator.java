@@ -29,104 +29,104 @@ import static ore.plugins.idea.lib.utils.FormatUtils.*;
 
 public class FreemarkerGenerator extends OrePluginGenerator {
 
-    private static final String BASE_RESOURCE_VIEW_TEMPLATE = "/templates/freemarker/base-resource-view";
-    private static final String EDIT_RESOURCE_VIEW_TEMPLATE = "/templates/freemarker/edit-resource-view";
-    private static final String RESOURCE_FORM_FIELD_TEMPLATE = "/templates/freemarker/section/resource-form-field";
-    private static final String RESOURCE_TABLE_HEAD_FORM_FIELD_TEMPLATE = "/templates/freemarker/section/resource-table-head-field";
-    private static final String RESOURCE_TABLE_BODY_FORM_FIELD_TEMPLATE = "/templates/freemarker/section/resource-table-body-field";
+    private static final String BASE_VIEW_TEMPLATE = "/templates/freemarker/base-resource-view";
+    private static final String EDIT_VIEW_TEMPLATE = "/templates/freemarker/edit-resource-view";
+    private static final String FORM_FIELD_TEMPLATE = "/templates/freemarker/section/resource-form-field";
+    private static final String THEAD_FIELD_TEMPLATE = "/templates/freemarker/section/resource-table-head-field";
+    private static final String TBODY_FIELD_TEMPLATE = "/templates/freemarker/section/resource-table-body-field";
     private static final String CSS_STYLES_TEMPLATE = "/templates/freemarker/swip-styles.css";
 
     private SwipRequest swipRequest;
 
-    private ControllerGenerator controllerGenerator;
+    private ResourcePersistableControllerGenerator controllerGenerator;
 
-    private String resourceSingular;
-    private String resourcePlural;
+    private String resourcePersistableSingular;
+    private String resourcePersistablePlural;
 
-    public FreemarkerGenerator(SwipRequest swipRequest, ControllerGenerator controllerGenerator) {
-        super(swipRequest.getResourceClass());
+    public FreemarkerGenerator(SwipRequest swipRequest, ResourcePersistableControllerGenerator controllerGenerator) {
+        super(swipRequest.getResourcePersistableClass());
         this.swipRequest = swipRequest;
         this.controllerGenerator = controllerGenerator;
-        this.resourceSingular = toFirstLetterLowerCase(Objects.requireNonNull(swipRequest.getResourceClass().getName()));
-        this.resourcePlural = toPlural(resourceSingular);
+        this.resourcePersistableSingular = toFirstLetterLowerCase(Objects.requireNonNull(swipRequest.getResourcePersistableClass().getName()));
+        this.resourcePersistablePlural = toPlural(resourcePersistableSingular);
 
     }
 
     public void generateResources() {
-        VirtualFile staticFolder = createBaseStructureTo(swipRequest.getResourceClass().getProject(), "/static");
+        VirtualFile staticFolder = createBaseStructureTo(swipRequest.getResourcePersistableClass().getProject(), "/static");
         createCssStylesFile(staticFolder);
 
-        VirtualFile templates = createBaseStructureTo(swipRequest.getResourceClass().getProject(), "/templates");
-        String resourceFolderPath = String.format("%s/%s", templates.getPath(), resourceSingular);
+        VirtualFile templates = createBaseStructureTo(swipRequest.getResourcePersistableClass().getProject(), "/templates");
+        String resourceFolderPath = String.format("%s/%s", templates.getPath(), resourcePersistableSingular);
         validateFileDoesNotExist(resourceFolderPath);
 
-        createVirtualFileIfNotExists(swipRequest.getResourceClass().getProject(), resourceFolderPath, true);
+        createVirtualFileIfNotExists(swipRequest.getResourcePersistableClass().getProject(), resourceFolderPath, true);
 
         createBaseResourceView(templates);
         createEditResourceView(templates);
     }
 
     private void createCssStylesFile(VirtualFile staticFolder) {
-        VirtualFile cssStylesFile = createVirtualFileIfNotExists(swipRequest.getResourceClass().getProject(), String.format("%s/swip-styles.css", staticFolder.getPath()), false);
+        VirtualFile cssStylesFile = createVirtualFileIfNotExists(swipRequest.getResourcePersistableClass().getProject(), String.format("%s/swip-styles.css", staticFolder.getPath()), false);
         writeContentToFile(cssStylesFile, provideTemplateContent(CSS_STYLES_TEMPLATE));
     }
 
 
     private void createBaseResourceView(VirtualFile templates) {
-        VirtualFile baseResourceView = createVirtualFileIfNotExists(swipRequest.getResourceClass().getProject(), String.format("%s/%s.ftl", templates.getPath(), controllerGenerator.getResourceViewPath()), false);
-        List<PsiField> resourceFields = extractCandidateResourceFields(field -> !field.equals(swipRequest.getResourceIdPsiField()));
+        VirtualFile baseResourceView = createVirtualFileIfNotExists(swipRequest.getResourcePersistableClass().getProject(), String.format("%s/%s.ftl", templates.getPath(), controllerGenerator.getResourcePersistableBaseViewPath()), false);
+        List<PsiField> resourceFields = extractCandidateResourceFields(field -> !field.equals(swipRequest.getResourcePersistableIdField()));
 
-        String resourceFormContent = extractResourceFormContent(resourceFields);
+        String resourcePersistableFormContent = extractresourcePersistableFormContent(resourceFields);
 
-        String resourceTableHeadContent = resourceFields
+        String resourcePersistableTHeadContent = resourceFields
                 .stream()
-                .map(field -> provideTemplateContent(RESOURCE_TABLE_HEAD_FORM_FIELD_TEMPLATE)
-                        .replace(extractTemplateReplacementValue("resourceFieldNameUpperCase"), toFirstLetterUpperCase(field.getNameIdentifier().getText())))
+                .map(field -> provideTemplateContent(THEAD_FIELD_TEMPLATE)
+                        .replace(extractTemplateReplacementValue("resourcePersistableFieldNameUpperCase"), toFirstLetterUpperCase(field.getNameIdentifier().getText())))
                 .collect(Collectors.joining(""));
 
-        String resourceTableBodyContent = resourceFields
+        String resourcePersistableTBodyContent = resourceFields
                 .stream()
-                .map(field -> provideTemplateContent(RESOURCE_TABLE_BODY_FORM_FIELD_TEMPLATE)
-                        .replace(extractTemplateReplacementValue("resourceFieldNameLowerCase"), field.getNameIdentifier().getText()))
+                .map(field -> provideTemplateContent(TBODY_FIELD_TEMPLATE)
+                        .replace(extractTemplateReplacementValue("resourcePersistableFieldNameLowerCase"), field.getNameIdentifier().getText()))
                 .collect(Collectors.joining(""));
 
-        String baseResourceViewFtl = provideTemplateContent(BASE_RESOURCE_VIEW_TEMPLATE)
-                .replaceAll(extractTemplateReplacementValue("baseResourceViewTitle"), toFirstLetterUpperCase(resourcePlural))
-                .replaceAll(extractTemplateReplacementValue("resourceBaseUri"), controllerGenerator.getResourceBaseUri())
-                .replaceAll(extractTemplateReplacementValue("resourceForm"), controllerGenerator.getResourceFormHolder())
-                .replaceAll(extractTemplateReplacementValue("resourceSearchForm"), controllerGenerator.getResourceSearchFormHolder())
-                .replaceAll(extractTemplateReplacementValue("resourceList"), controllerGenerator.getResourceListHolder())
-                .replace(extractTemplateReplacementValue("resourceFormContent"), resourceFormContent)
-                .replace(extractTemplateReplacementValue("resourceTableHeadContent"), resourceTableHeadContent)
-                .replace(extractTemplateReplacementValue("resourceTableBodyContent"), resourceTableBodyContent);
+        String baseResourceViewFtl = provideTemplateContent(BASE_VIEW_TEMPLATE)
+                .replaceAll(extractTemplateReplacementValue("resourcePersistableBaseViewTitle"), toFirstLetterUpperCase(resourcePersistablePlural))
+                .replaceAll(extractTemplateReplacementValue("resourcePersistableBaseUri"), controllerGenerator.getResourcePersistableBaseUri())
+                .replaceAll(extractTemplateReplacementValue("resourcePersistableForm"), controllerGenerator.getResourcePersistableFormHolder())
+                .replaceAll(extractTemplateReplacementValue("resourcePersistableSearchForm"), controllerGenerator.getResourcePersistableSearchFormHolder())
+                .replaceAll(extractTemplateReplacementValue("resourcePersistableList"), controllerGenerator.getResourcePersistableListHolder())
+                .replace(extractTemplateReplacementValue("resourcePersistableFormContent"), resourcePersistableFormContent)
+                .replace(extractTemplateReplacementValue("resourcePersistableTHeadContent"), resourcePersistableTHeadContent)
+                .replace(extractTemplateReplacementValue("resourcePersistableTBodyContent"), resourcePersistableTBodyContent);
 
         writeContentToFile(baseResourceView, baseResourceViewFtl);
     }
 
     private void createEditResourceView(VirtualFile templates) {
-        VirtualFile editResourceView = createVirtualFileIfNotExists(swipRequest.getResourceClass().getProject(), String.format("%s/%s.ftl", templates.getPath(), controllerGenerator.getEditResourceViewPath()), false);
-        List<PsiField> resourceFields = extractCandidateResourceFields(field -> !field.equals(swipRequest.getResourceIdPsiField()));
-        String resourceFormContent = extractResourceFormContent(resourceFields);
-        String editResourceViewContent = provideTemplateContent(EDIT_RESOURCE_VIEW_TEMPLATE)
-                .replaceAll(extractTemplateReplacementValue("editResourceViewTitle"), String.format("Edit %s", toFirstLetterUpperCase(resourceSingular)))
-                .replaceAll(extractTemplateReplacementValue("resourceBaseUri"), controllerGenerator.getResourceBaseUri())
-                .replaceAll(extractTemplateReplacementValue("resourceForm"), controllerGenerator.getResourceFormHolder())
-                .replace(extractTemplateReplacementValue("resourceFormContent"), resourceFormContent);
+        VirtualFile editResourceView = createVirtualFileIfNotExists(swipRequest.getResourcePersistableClass().getProject(), String.format("%s/%s.ftl", templates.getPath(), controllerGenerator.getResourcePersistableEditViewPath()), false);
+        List<PsiField> resourceFields = extractCandidateResourceFields(field -> !field.equals(swipRequest.getResourcePersistableIdField()));
+        String resourcePersistableFormContent = extractresourcePersistableFormContent(resourceFields);
+        String editResourceViewContent = provideTemplateContent(EDIT_VIEW_TEMPLATE)
+                .replaceAll(extractTemplateReplacementValue("editResourcePersistableViewTitle"), String.format("Edit %s", toFirstLetterUpperCase(resourcePersistableSingular)))
+                .replaceAll(extractTemplateReplacementValue("resourcePersistableBaseUri"), controllerGenerator.getResourcePersistableBaseUri())
+                .replaceAll(extractTemplateReplacementValue("resourcePersistableForm"), controllerGenerator.getResourcePersistableFormHolder())
+                .replace(extractTemplateReplacementValue("resourcePersistableFormContent"), resourcePersistableFormContent);
 
         writeContentToFile(editResourceView, editResourceViewContent);
     }
 
-    private String extractResourceFormContent(List<PsiField> resourceFields) {
+    private String extractresourcePersistableFormContent(List<PsiField> resourceFields) {
         return resourceFields
                 .stream()
-                .filter(field -> !field.equals(swipRequest.getResourceIdPsiField()))
+                .filter(field -> !field.equals(swipRequest.getResourcePersistableIdField()))
                 .map(field -> {
-                    String resourceFieldTemplate = provideTemplateContent(RESOURCE_FORM_FIELD_TEMPLATE);
+                    String resourceFieldTemplate = provideTemplateContent(FORM_FIELD_TEMPLATE);
                     return resourceFieldTemplate
-                            .replaceAll(extractTemplateReplacementValue("resourceFieldNameLowerCase"), toFirstLetterLowerCase(field.getNameIdentifier().getText()))
-                            .replaceAll(extractTemplateReplacementValue("resourceFieldNameUpperCase"), toFirstLetterUpperCase(field.getNameIdentifier().getText()))
-                            .replaceAll(extractTemplateReplacementValue("resourceFieldName"), field.getNameIdentifier().getText())
-                            .replaceAll(extractTemplateReplacementValue("resourceForm"), controllerGenerator.getResourceFormHolder());
+                            .replaceAll(extractTemplateReplacementValue("resourcePersistableFieldNameLowerCase"), toFirstLetterLowerCase(field.getNameIdentifier().getText()))
+                            .replaceAll(extractTemplateReplacementValue("resourcePersistableFieldNameUpperCase"), toFirstLetterUpperCase(field.getNameIdentifier().getText()))
+                            .replaceAll(extractTemplateReplacementValue("resourcePersistableFieldName"), field.getNameIdentifier().getText())
+                            .replaceAll(extractTemplateReplacementValue("resourcePersistableForm"), controllerGenerator.getResourcePersistableFormHolder());
                 }).collect(Collectors.joining(""));
     }
 
