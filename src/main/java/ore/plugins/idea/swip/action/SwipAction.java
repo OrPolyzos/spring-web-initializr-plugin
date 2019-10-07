@@ -4,16 +4,12 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.dataformat.xml.XmlMapper;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.command.WriteCommandAction;
-import com.intellij.openapi.project.Project;
 import com.intellij.openapi.roots.ProjectRootManager;
 import com.intellij.openapi.ui.Messages;
-import com.intellij.psi.JavaPsiFacade;
 import com.intellij.psi.PsiClass;
 import com.intellij.psi.PsiField;
 import com.intellij.psi.PsiModifier;
-import com.intellij.psi.search.GlobalSearchScope;
 import ore.plugins.idea.lib.action.OrePluginAction;
-import ore.plugins.idea.lib.dialog.InputDialog;
 import ore.plugins.idea.lib.dialog.SelectStuffDialog;
 import ore.plugins.idea.lib.exception.CancelException;
 import ore.plugins.idea.lib.exception.InvalidFileException;
@@ -61,15 +57,22 @@ public class SwipAction extends OrePluginAction {
         File pom = requestPomXml(resourcePsiClass);
         validateMavenDependencies(pom);
 
+        PsiField idPsiField = requestResourceIdField(resourcePsiClass);
+
+        PackageInputDialog packageInputDialog = new PackageInputDialog(resourcePsiClass);
+        packageInputDialog.waitForInput();
+
+
+
         SwipRequest swipRequest = SwipRequest.SwipRequestBuilder
-                .aSwipRequest(resourcePsiClass, requestResourceIdField(resourcePsiClass))
+                .aSwipRequest(resourcePsiClass, idPsiField)
                 // TODO ADD SUPPORT FOR CUSTOM RESOURCE FORM
                 .withResourcePersistableFormClass(resourcePsiClass)
                 // TODO ADD SUPPORT FOR CUSTOM RESOURCE SEARCH FORM
                 .withResourcePersistableSearchFormClass(resourcePsiClass)
-                .withResourcePersistableRepositoryPackage(requestPackage(resourcePsiClass, String.format("Package for ResourcePersistableRepository (i.e. %sResourcePersistableRepository)", resourcePsiClass.getName()), "ResourcePersistableRepository"))
-                .withResourcePersistableServicePackage(requestPackage(resourcePsiClass, String.format("Package for ResourcePersistableService (i.e. %sResourcePersistableService)", resourcePsiClass.getName()), "ResourcePersistableService"))
-                .withResourcePersistableControllerPackage(requestPackage(resourcePsiClass, String.format("Package for ResourcePersistableController (i.e. %sResourcePersistableController)", resourcePsiClass.getName()), "ResourcePersistableController"))
+                .withResourcePersistableRepositoryPackage(packageInputDialog.getRepositoryPackageField())
+                .withResourcePersistableServicePackage(packageInputDialog.getServicePackageField())
+                .withResourcePersistableControllerPackage(packageInputDialog.getControllerPackageField())
                 .build();
 
         act(swipRequest);
@@ -118,34 +121,6 @@ public class SwipAction extends OrePluginAction {
                 .orElseThrow(() -> new ValidationException("Invalid selection for the ResourcePersistable ID"));
     }
 
-    @NotNull
-    private String requestPackage(PsiClass resourcePsiClass, String title, String suffix) {
-        String fullPackage;
-        do {
-            InputDialog packageInputDialog = new PackageInputDialog(resourcePsiClass, title, "Place in package (e.g. ore.swip.demo) or leave empty for default");
-            packageInputDialog.waitForInput();
-            fullPackage = packageInputDialog.getInput();
-        } while (!packageExistsAlready(fullPackage, resourcePsiClass.getProject())
-                || classExistsAlready(String.format("%s.%s%s", fullPackage, resourcePsiClass.getName(), suffix), resourcePsiClass.getProject()));
-        return fullPackage;
-    }
-
-    private boolean packageExistsAlready(String fullPackagePath, Project project) {
-        boolean packageExists = Files.exists(Paths.get(ProjectRootManager.getInstance(project).getContentRoots()[0].getPath().concat("/src/main/java/").concat(fullPackagePath.replaceAll("\\.", "/"))));
-        if (!packageExists) {
-            Messages.showWarningDialog("Package does not exist.", "Invalid Package");
-        }
-        return packageExists;
-    }
-
-    private boolean classExistsAlready(String qualifiedName, Project project) {
-        boolean existsAlready = JavaPsiFacade.getInstance(project).findClass(qualifiedName, GlobalSearchScope.allScope(project)) != null;
-        if (existsAlready) {
-            Messages.showWarningDialog(String.format("There is already a class %s.", qualifiedName), "Duplicate File");
-        }
-        return existsAlready;
-    }
-
     private boolean excludeStaticOrFinal(PsiField psiField) {
         return !Objects.requireNonNull(psiField.getModifierList()).hasModifierProperty(PsiModifier.STATIC) || Objects.requireNonNull(psiField.getModifierList()).hasModifierProperty(PsiModifier.FINAL);
     }
@@ -162,7 +137,8 @@ public class SwipAction extends OrePluginAction {
             ResourcePersistableControllerGenerator controllerGenerator = new ResourcePersistableControllerGenerator(swipRequest, resourceServiceClass);
             controllerGenerator.generateJavaClass();
 
-            new FreemarkerGenerator(swipRequest, controllerGenerator).generateResources(); });
+            new FreemarkerGenerator(swipRequest, controllerGenerator).generateResources();
+        });
     }
 
 
