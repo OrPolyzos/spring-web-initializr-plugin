@@ -1,20 +1,78 @@
-# Swip *(Spring Web Initializr Plugin)*
-* Create a fully functional (Spring Boot) WebApp with just a few clicks
-* Reduce the boilerplate code
+Swip *(Spring Web Initializr Plugin)*
+==========
+[![release-2.0.0][shield-release]](#)
+[![code-coverage-100%][shield-coverage]](#)  
+[![jdk-8][shield-jdk]](#)
+[![swi-3.0.0][shield-spring]](#)
+[![MIT licensed][shield-license]](#)
 
-## Demonstration
-![Demo gif](/../screenshots/swip-demo.gif?raw=true)
+[Swip (Spring Web Initializr Plugin)](https://plugins.jetbrains.com/plugin/12239-swip-spring-web-initializr-) _(will be referenced __Swip__ from now on)_ is a plugin for IntelliJ IDEA.  
+It will help you create fully functional Spring Boot WebApps with just a few clicks, based on your Entities.
 
-## Download
+Table of Contents
+-----------------
+  * [Demonstration](#Demonstration)
+  * [Download](#Download)
+  * [Prerequisites](#Prerequisites)
+  * [Usage](#Usage)
+  * [Description](#Description)
+  * [Contributing](#Contributing)
+  * [License](#License)
+  * [Releases](#Releases)
+  
+  
+Demonstration
+-------------
+![Demonstration Gif](/../screenshots/swip-demo.gif?raw=true)
+
+Download
+--------
 Get it through IntelliJ IDEA by writing *Swip* (Spring Web Initializr Plugin) or else through the [Jetbrains Repo](https://plugins.jetbrains.com/plugin/12239-swip-spring-web-initializr)
 
-## How To
-1) Create a Java class for your entity (e.g. User) with all its' desired fields (e.g. firstName, lastName, etc...)
+Prerequisites
+-------------
+[__spring-web-initializr__](https://github.com/OrPolyzos/spring-web-initializr)
+
+Spring Web Initializr is a separate library has been developed in order to support the Swip and avoid duplicate code, where that's possible.  
+__As such, the following dependency is mandatory and should be added to your `pom.xml`.__
+```xml
+<dependency>
+    <groupId>io.github.orpolyzos</groupId>
+    <artifactId>spring-web-initializr</artifactId>
+    <version>3.0.0</version>
+</dependency>
+```
+
+[__freemarker__](https://freemarker.apache.org/)
+
+Freemarker is a template engine provided by Apache. Swip by default will generate the frontend resources using the Freemarker syntax. _(In the future Thymeleaf will be supported as well)_  
+__As such, the following dependency is mandatory and should be added to your `pom.xml`.__
+```xml
+<dependency>
+    <groupId>org.springframework.boot</groupId>
+    <artifactId>spring-boot-starter-freemarker</artifactId>
+</dependency>
+```
+
+Usage
+-----
+1) Create a Java class for your Entity (e.g. User) with all its' desired fields (e.g. id, firstName, lastName, etc...)
 2) Right click inside the class to get the editor menu
 3) Click the `Swip` option and follow the instructions
+4) Choose the field that will be used as the primary key for the Entity
+5) Choose the packages for the generated Controller, Service, Repository classes
 
-## TL;DR
-Below are some samples to get you started.
+Description
+-----------
+Swip will generate all the code required for a functional WebApp based on your Entities. 
+It is based on the __convention over configuration__ paradigm. 
+During the generation phase, the actual configuration is limited, but after the files have been generated they can obviously be modified as needed.
+
+Obviously Swip is not going to meet your exact business requirements all the times and tweaking may be required, but it is going to provide you with the base stuff to get you started faster.
+
+_TL;DR_  
+Below are some samples to get you started.  
+
 <details>
     <summary>pom.xml</summary>
         
@@ -34,7 +92,7 @@ Below are some samples to get you started.
     <parent>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-parent</artifactId>
-        <version>1.5.7.RELEASE</version>
+        <version>2.1.6.RELEASE</version>
         <relativePath/> <!-- lookup parent from repository -->
     </parent>
 
@@ -45,12 +103,17 @@ Below are some samples to get you started.
     </properties>
 
     <dependencies>
-        <!-- Mandatory for Swip -->
+        <!-- Mandatory for Swip BEGIN-->
         <dependency>
             <groupId>io.github.orpolyzos</groupId>
             <artifactId>spring-web-initializr</artifactId>
             <version>1.1.0</version>
         </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-freemarker</artifactId>
+        </dependency>
+        <!-- Mandatory for Swip END-->
         <dependency>
             <groupId>com.h2database</groupId>
             <artifactId>h2</artifactId>
@@ -72,14 +135,9 @@ Below are some samples to get you started.
 </details>
 
 <details>
-    <summary>User.java (sample pojo)</summary>
+    <summary>User.java _(Getters/Setters omitted)_</summary>
         
 ```java
-package ore.swip.demo.domain;
-
-import javax.persistence.*;
-import java.util.List;
-
 @Entity(name = "user")
 public class User {
 
@@ -94,72 +152,61 @@ public class User {
     @Column(name = "last_name", nullable = false)
     private String lastName;
 
-    @Column(name = "password", nullable = false)
-    private String password;
-
     @Column(name = "email", nullable = false, unique = true)
     private String email;
-
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-    public String getFirstName() {
-        return firstName;
-    }
-
-    public void setFirstName(String firstName) {
-        this.firstName = firstName;
-    }
-
-    public String getLastName() {
-        return lastName;
-    }
-
-    public void setLastName(String lastName) {
-        this.lastName = lastName;
-    }
-
-    public String getPassword() {
-        return password;
-    }
-
-    public void setPassword(String password) {
-        this.password = password;
-    }
-
-    public String getEmail() {
-        return email;
-    }
-
-    public void setEmail(String email) {
-        this.email = email;
-    }
 
 }
 
 ```
 </details>
 
-## Prerequisites
+_Frontend resources_  
+The end user of any web application, should be in place to perform the basic CRUD operations through the provided screens for each Entity (e.g. User, Vehicle, etc..)
 
-__spring-web-initializr__ (https://github.com/OrPolyzos/spring-web-initializr)
+* ResourcePersistableBaseView - __Create Read Delete__  
+  * Form that provides the required fields to save a ResourcePersistable (e.g. UserForm, VehicleForm, etc...)
+  * Form that provides the required fields to search for a Resource (e.g. UserSearchForm, VehicleSearchForm, etc...)
+  * Table that provides the fields of retrieved ResourcePersistables as well as the option to Delete/Edit one
 
-In order to avoid duplicate code a separate library has been developed, that is being used by Swip.
-As such, the following dependency is mandatory and should be added to your pom.xml
-```xml
-<dependency>
-    <groupId>io.github.orpolyzos</groupId>
-    <artifactId>spring-web-initializr</artifactId>
-    <version>1.1.0</version>
-</dependency>
-```
+* ResourcePersistableEditView - __Edit__  
+  * Form that provides the required fields to edit a ResourcePersistable (e.g. UserForm, VehicleForm, etc...)
 
-## Release History
+_ResourcePersistableController_  
+Based on the provided front end implementation, the ResourcePersistableController should be able to: 
+* getResourcePersistableBaseView() -> serves Page #1
+* createResourcePersistable() -> creates a ResourcePersistable and serves Page #1
+* searchResourcePersistablesBy() -> searches for ResourcePersistables (optionally based on a ResourcePersistableSearchForm) and serves Page #1 filled with the found list of ResourcePersistables
+* deleteResourcePersistable() -> deletes a ResourcePersistable and serves Page #1
+* getResourcePersistableEditView() -> searches for a specific ResourcePersistable and serves Page #2 filled with its' fields
+* editResourcePersistable() -> updates a ResourcePersistable and serves Page #1
+
+_ResourcePersistableService_
+Based on the provided ResourcePersistableController, the ResourcePersistableService should be able to:
+* find(ID) -> searches a ResourcePersistable by its' ID and returns it
+* findOptional(ID) -> searches a ResourcePersistable by its' ID and returns an Optional<ResourcePersistable>
+* findOrThrow(ID) -> searches a ResourcePersistable by its' ID and returns it or throws a RPRuntimeNotFoundException
+* findAll() -> searches for all ResourcePersistables and returns a List<ResourcePersistable>
+* insert(ResourcePersistable) -> searches for duplicate Resources and throws a RPRuntimeDuplicateException if found, or else saves the ResourcePersistable
+* update(ResourcePersistable) -> searches for the specific ResourcePersistable and updates it if found, or else throws a RPRuntimeNotFoundException
+* searchBy(ResourcePersistableSearchForm) -> searches for ResourcePersistables based on a ResourcePersistableSearchForm and returns a List<ResourcePersistable> (by default returns findAll())
+  
+Contributing
+------------
+To contribute to Spring Web Initializr Plugin, follow the instructions in our [contributing guide](/contributing.md).
+
+License
+-------
+Spring Web Initializr Plugin is licensed under the [MIT](/license.md) license.  
+Copyright &copy; 2019, Orestes Polyzos
+
+[shield-release]: https://img.shields.io/badge/release-2.0.0-brightgreen.svg
+[shield-coverage]: https://img.shields.io/badge/coverage-0%25-red.svg
+[shield-jdk]: https://img.shields.io/badge/jdk-8-blue.svg
+[shield-spring]: https://img.shields.io/badge/swi-3.0.0-blue.svg
+[shield-license]: https://img.shields.io/badge/license-MIT-blue.svg
+
+Releases
+---------------
 * <strong>1.1.0</strong>
     * Adds support for spring-boot-starter-parent from version '1.5.20.RELEASE' up to LATEST
     * Adds support for older IntelliJ IDEA since build '171.4424.54'
@@ -169,46 +216,3 @@ As such, the following dependency is mandatory and should be added to your pom.x
     * Adds support for spring-boot-starter-web
     * Adds support for spring-boot-starter-data-jpa
     * Adds support for spring-boot-starter-freemarker
-
-## Description
-Swip will generate all the code required for a functional WebApp based on your domain classes. 
-It is based on the __convention over configuration__ paradigm. 
-During the generation phase, the actual configuration is limited, but after the files have been generated they can obviously be configured/changed as needed.
-
-Obviously Swip is not going to meet your exact business requirements all the times and tweaking may be required, but it is going to provide you with the base stuff to get you started faster.
-
-### Front end (only Freemarker is supported at the moment)
-In any web application the end user should be in place to perform the basic CRUD operations through the provided screens for each Entity (e.g. User)
-
-* Page #1 - Create Read Delete<br/>
-    * Form that provides the required fields to save an Resource (e.g. UserForm)
-    * Form that provides the required fields to search for a Resource (e.g. UserSearchForm)
-    * Table that provides the fields of retrieved Entities as well as the option to Delete/Edit a Resource
-
-* Page #2 - Edit<br/>
-    * Form that provides the required fields to update a Resource (e.g. UserForm)
-
-Apart from the specific fields of each Entity, all the pages are actually the exact same thing.
-
-### ResourceController
-Based on the provided front end implementation, the ResourceController should be able to: 
-* getBaseResourceView() -> serves Page #1
-* createResource() -> creates a Resource and serves Page #1
-* searchBy() -> searches for Resources (optionally based on a SearchForm) and serves Page #1 filled with the found list of Resources
-* deleteResource() -> deletes a Resource and serves Page #1
-* getEditResource() -> searches for a specific Resource and serves Page #2 filled with its' fields
-* editResource() -> updates a Resource and serves Page #1
-
-### ResourceService
-Based on the provided ResourceController, the ResourceService should be able to:
-* find(ID) -> searches a Resource by its' ID and returns it
-* findOptional(ID) -> searches a Resource by its' ID and returns an Optional<Resource>
-* findOrThrow(ID) -> searches a Resource by its' ID and returns it or throws a ResourceNotFoundException
-* findAll() -> searches for all Resources and returns an Iterable<Resource>
-* insert(Resource) -> searches for duplicate Resources and throws a DuplicateResourceException if found, or else saves the Resource
-* update(Resource) -> searches for the specific Resource and updates it if found, or else throws a ResourceNotFoundException
-* searchBy(resourcePersistableSearchForm) -> searches for Resources based on a  resourcePersistableSearchForm and returns an Iterable<Resource> (by default returns findAll())
-
-
-## Authors
-* [**Orestes Polyzos**](https://github.com/OrPolyzos) - *Initial work*

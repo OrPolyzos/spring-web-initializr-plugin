@@ -9,6 +9,8 @@ import com.intellij.openapi.ui.Messages;
 import com.intellij.psi.PsiClass;
 import com.intellij.psi.PsiField;
 import com.intellij.psi.PsiModifier;
+import com.intellij.ui.ColorChooser;
+import com.intellij.ui.JBColor;
 import ore.plugins.idea.lib.action.OrePluginAction;
 import ore.plugins.idea.lib.dialog.SelectStuffDialog;
 import ore.plugins.idea.lib.exception.CancelException;
@@ -24,6 +26,7 @@ import ore.spring.web.initializr.domain.ResourcePersistable;
 import org.jetbrains.annotations.NotNull;
 
 import javax.swing.*;
+import java.awt.*;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
@@ -61,8 +64,6 @@ public class SwipAction extends OrePluginAction {
 
         PackageInputDialog packageInputDialog = new PackageInputDialog(resourcePsiClass);
         packageInputDialog.waitForInput();
-
-
 
         SwipRequest swipRequest = SwipRequest.SwipRequestBuilder
                 .aSwipRequest(resourcePsiClass, idPsiField)

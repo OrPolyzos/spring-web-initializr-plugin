@@ -189,8 +189,8 @@ public class ResourcePersistableControllerGenerator extends SwipJavaCodeGenerato
 
         String qualifiedResourcePersistableServiceName = String.format("ore.spring.web.initializr.service.ResourcePersistableService<%s,%s,%s>",
                 swipRequest.getResourcePersistableClass().getQualifiedName(),
-                swipRequest.getResourcePersistableFormClass().getQualifiedName(),
-                swipRequest.getResourcePersistableIdQualifiedName());
+                swipRequest.getResourcePersistableIdQualifiedName(),
+        swipRequest.getResourcePersistableFormClass().getQualifiedName());
 
         PsiField resourcePersistableServiceElement = getElementFactory()
                 .createFieldFromText(

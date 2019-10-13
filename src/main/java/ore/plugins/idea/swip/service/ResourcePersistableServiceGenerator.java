@@ -42,9 +42,9 @@ public class ResourcePersistableServiceGenerator extends SwipJavaCodeGenerator {
 
         String resourcePersistableServiceQualifiedName = String.format("ore.spring.web.initializr.service.ResourcePersistableService<%s,%s,%s>",
                 swipRequest.getResourcePersistableClass().getQualifiedName(),
-                swipRequest.getResourcePersistableSearchFormClass().getQualifiedName(),
-                swipRequest.getResourcePersistableIdQualifiedName());
-        addQualifiedExtendsToClass(resourcePersistableServiceQualifiedName, resourcePersistableService);
+                swipRequest.getResourcePersistableIdQualifiedName(),
+        swipRequest.getResourcePersistableSearchFormClass().getQualifiedName());
+                addQualifiedExtendsToClass(resourcePersistableServiceQualifiedName, resourcePersistableService);
 
         String qualifiedResourcePersistableRepositoryName = String.format("org.springframework.data.repository.CrudRepository<%s,%s>",
                 swipRequest.getResourcePersistableClass().getQualifiedName(), swipRequest.getResourcePersistableIdQualifiedName());

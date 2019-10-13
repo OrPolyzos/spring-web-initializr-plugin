@@ -36,8 +36,6 @@ public class PackageInputDialog extends OrePluginDialog {
     private JBTextField repositoryPackageField;
     private JBLabel repositoryPackageLabel;
 
-    private JBLabel hintLine;
-
     public PackageInputDialog(PsiClass resourceClass) {
         super(resourceClass.getProject());
         this.controllerClassName = String.format("%sResourcePersistableController", resourceClass.getName());
@@ -48,9 +46,7 @@ public class PackageInputDialog extends OrePluginDialog {
         setResizable(false);
 
         JPanel jPanel = createVerticalPanel();
-        hintLine = new JBLabel("\r\n");
-        hintLine.setForeground(JBColor.RED);
-        jPanel.add(hintLine);
+        jPanel.add(new JBLabel("\r\n"));
 
         controllerPackageField = new JBTextField();
         controllerPackageLabel = new JBLabel();
@@ -65,6 +61,7 @@ public class PackageInputDialog extends OrePluginDialog {
         setupFieldWithLabel(repositoryPackageField, repositoryPackageLabel, repositoryClassName + ":", jPanel);
 
         labeledComponent = LabeledComponent.create(jPanel, COMPONENT_TEXT);
+
         validateFields();
         showDialog();
 

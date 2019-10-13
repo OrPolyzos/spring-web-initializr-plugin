@@ -168,7 +168,7 @@ public class FreemarkerGenerator extends OrePluginGenerator {
 
     private void validateFileDoesNotExist(String path) {
         if (new File(path).exists()) {
-            throw new InvalidStructureException(String.format("There is already a directory '%s'. Skipping freemarker resources creation...", path));
+            throw new InvalidStructureException(String.format("There is already a directory '%s'. Skipping template resources creation...", path));
         }
     }
 
