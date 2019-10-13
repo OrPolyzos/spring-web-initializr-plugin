@@ -16,9 +16,9 @@ Table of Contents
   * [Prerequisites](#Prerequisites)
   * [Usage](#Usage)
   * [Description](#Description)
+  * [Releases](#Releases)
   * [Contributing](#Contributing)
   * [License](#License)
-  * [Releases](#Releases)
   
   
 Demonstration
@@ -180,7 +180,7 @@ Based on the provided front end implementation, the ResourcePersistableControlle
 * getResourcePersistableEditView() -> searches for a specific ResourcePersistable and serves Page #2 filled with its' fields
 * editResourcePersistable() -> updates a ResourcePersistable and serves Page #1
 
-_ResourcePersistableService_
+_ResourcePersistableService_  
 Based on the provided ResourcePersistableController, the ResourcePersistableService should be able to:
 * find(ID) -> searches a ResourcePersistable by its' ID and returns it
 * findOptional(ID) -> searches a ResourcePersistable by its' ID and returns an Optional<ResourcePersistable>
@@ -190,6 +190,18 @@ Based on the provided ResourcePersistableController, the ResourcePersistableServ
 * update(ResourcePersistable) -> searches for the specific ResourcePersistable and updates it if found, or else throws a RPRuntimeNotFoundException
 * searchBy(ResourcePersistableSearchForm) -> searches for ResourcePersistables based on a ResourcePersistableSearchForm and returns a List<ResourcePersistable> (by default returns findAll())
   
+Releases
+---------------
+* <strong>1.1.0</strong>
+    * Adds support for spring-boot-starter-parent from version '1.5.20.RELEASE' up to LATEST
+    * Adds support for older IntelliJ IDEA since build '171.4424.54'
+
+* <strong>1.0.0</strong> - First Release
+    * Adds support for Maven
+    * Adds support for spring-boot-starter-web
+    * Adds support for spring-boot-starter-data-jpa
+    * Adds support for spring-boot-starter-freemarker
+    
 Contributing
 ------------
 To contribute to Spring Web Initializr Plugin, follow the instructions in our [contributing guide](/contributing.md).
@@ -203,16 +215,4 @@ Copyright &copy; 2019, Orestes Polyzos
 [shield-coverage]: https://img.shields.io/badge/coverage-0%25-red.svg
 [shield-jdk]: https://img.shields.io/badge/jdk-8-blue.svg
 [shield-spring]: https://img.shields.io/badge/swi-3.0.0-blue.svg
-[shield-license]: https://img.shields.io/badge/license-MIT-blue.svg
-
-Releases
----------------
-* <strong>1.1.0</strong>
-    * Adds support for spring-boot-starter-parent from version '1.5.20.RELEASE' up to LATEST
-    * Adds support for older IntelliJ IDEA since build '171.4424.54'
-
-* <strong>1.0.0</strong> - First Release
-    * Adds support for Maven
-    * Adds support for spring-boot-starter-web
-    * Adds support for spring-boot-starter-data-jpa
-    * Adds support for spring-boot-starter-freemarker
+[shield-license]: https://img.shields.io/badge/license-MIT-blue.svg    
