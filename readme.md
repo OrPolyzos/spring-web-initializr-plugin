@@ -135,7 +135,7 @@ Below are some samples to get you started.
 </details>
 
 <details>
-    <summary>User.java _(Getters/Setters omitted)_</summary>
+    <summary>User.java (Getters/Setters omitted)</summary>
         
 ```java
 @Entity(name = "user")
