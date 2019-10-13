@@ -168,7 +168,7 @@ The end user of any web application, should be in place to perform the basic CRU
   * Form that provides the required fields to search for a Resource (e.g. UserSearchForm, VehicleSearchForm, etc...)
   * Table that provides the fields of retrieved ResourcePersistables as well as the option to Delete/Edit one
 
-* ResourcePersistableEditView - __Edit__  
+* ResourcePersistableEditView - __Update__  
   * Form that provides the required fields to edit a ResourcePersistable (e.g. UserForm, VehicleForm, etc...)
 
 _ResourcePersistableController_  
