@@ -70,7 +70,7 @@ During the generation phase, the actual configuration is limited, but after the 
 
 Obviously Swip is not going to meet your exact business requirements all the times and tweaking may be required, but it is going to provide you with the base stuff to get you started faster.
 
-_TL;DR_  
+__TL;DR__  
 Below are some samples to get you started.  
 
 <details>
