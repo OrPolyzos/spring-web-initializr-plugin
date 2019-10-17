@@ -160,43 +160,44 @@ public class User {
 ```
 </details>
 
-_Frontend resources_  
+__Frontend resources__  
 The end user of any web application, should be in place to perform the basic CRUD operations through the provided screens for each Entity (e.g. User, Vehicle, etc..)
 
-* ResourcePersistableBaseView - __Create Read Delete__  
+* ResourcePersistableBaseView Page - __Create Read Delete__  
   * Form that provides the required fields to save a ResourcePersistable (e.g. UserForm, VehicleForm, etc...)
   * Form that provides the required fields to search for a Resource (e.g. UserSearchForm, VehicleSearchForm, etc...)
   * Table that provides the fields of retrieved ResourcePersistables as well as the option to Delete/Edit one
 
-* ResourcePersistableEditView - __Update__  
+* ResourcePersistableEditView Page - __Update__  
   * Form that provides the required fields to edit a ResourcePersistable (e.g. UserForm, VehicleForm, etc...)
 
-_ResourcePersistableController_  
+__ResourcePersistableController__  
 Based on the provided front end implementation, the ResourcePersistableController should be able to: 
-* getResourcePersistableBaseView() -> serves Page #1
-* createResourcePersistable() -> creates a ResourcePersistable and serves Page #1
-* searchResourcePersistablesBy() -> searches for ResourcePersistables (optionally based on a ResourcePersistableSearchForm) and serves Page #1 filled with the found list of ResourcePersistables
-* deleteResourcePersistable() -> deletes a ResourcePersistable and serves Page #1
-* getResourcePersistableEditView() -> searches for a specific ResourcePersistable and serves Page #2 filled with its' fields
-* editResourcePersistable() -> updates a ResourcePersistable and serves Page #1
+* __@GetMapping("/resourcePersistables")__ &rarr; serves ResourcePersistableBaseView
+* __@PostMapping("/resourcePersistables")__ &rarr; creates a ResourcePersistable and serves ResourcePersistableBaseView
+* __@PostMapping("/resourcePersistables/search")__ &rarr; searches for ResourcePersistables (optionally based on a ResourcePersistableSearchForm) and serves ResourcePersistableBaseView filled with the list of ResourcePersistables, that were found
+* __@PostMapping("/resourcePersistables/{resourcePersistableId}")__ &rarr; deletes a ResourcePersistable and serves ResourcePersistableBaseView
+* __@GetMapping("/resourcePersistables/{resourcePersistableId}/edit")__ &rarr; searches for a specific ResourcePersistable and serves ResourcePersistableEditView filled with its' fields
+* __@PostMapping("/resourcePersistables/{resourcePersistableId}/edit")__ &rarr; updates a ResourcePersistable and serves ResourcePersistableBaseView
 
-_ResourcePersistableService_  
+__ResourcePersistableService__  
 Based on the provided ResourcePersistableController, the ResourcePersistableService should be able to:
-* find(ID) -> searches a ResourcePersistable by its' ID and returns it
-* findOptional(ID) -> searches a ResourcePersistable by its' ID and returns an Optional<ResourcePersistable>
-* findOrThrow(ID) -> searches a ResourcePersistable by its' ID and returns it or throws a RPRuntimeNotFoundException
-* findAll() -> searches for all ResourcePersistables and returns a List<ResourcePersistable>
-* insert(ResourcePersistable) -> searches for duplicate Resources and throws a RPRuntimeDuplicateException if found, or else saves the ResourcePersistable
-* update(ResourcePersistable) -> searches for the specific ResourcePersistable and updates it if found, or else throws a RPRuntimeNotFoundException
-* searchBy(ResourcePersistableSearchForm) -> searches for ResourcePersistables based on a ResourcePersistableSearchForm and returns a List<ResourcePersistable> (by default returns findAll())
+* find(ID) &rarr; searches a ResourcePersistable by its' ID and returns it
+* findOptional(ID) &rarr; searches a ResourcePersistable by its' ID and returns an Optional<ResourcePersistable>
+* findOrThrow(ID) &rarr; searches a ResourcePersistable by its' ID and returns it or throws a RPRuntimeNotFoundException
+* findAll() &rarr; searches for all ResourcePersistables and returns a List<ResourcePersistable>
+* insert(ResourcePersistable) &rarr; searches for duplicate Resources and throws a RPRuntimeDuplicateException if found, or else saves the ResourcePersistable
+* update(ResourcePersistable) &rarr; searches for the specific ResourcePersistable and updates it if found, or else throws a RPRuntimeNotFoundException
+* searchBy(ResourcePersistableSearchForm) &rarr; searches for ResourcePersistables based on a ResourcePersistableSearchForm and returns a List<ResourcePersistable> (by default returns findAll())
   
 Releases
 ---------------
-* <strong>1.1.0</strong>
+* __2.0.0__
+    * Changes all generated names to use the ResourcePersistable prefix/suffix
+* __1.1.0__
     * Adds support for spring-boot-starter-parent from version '1.5.20.RELEASE' up to LATEST
     * Adds support for older IntelliJ IDEA since build '171.4424.54'
-
-* <strong>1.0.0</strong> - First Release
+* __1.0.0__
     * Adds support for Maven
     * Adds support for spring-boot-starter-web
     * Adds support for spring-boot-starter-data-jpa
