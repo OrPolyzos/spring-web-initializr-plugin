@@ -193,7 +193,9 @@ Based on the provided ResourcePersistableController, the ResourcePersistableServ
 Releases
 ---------------
 * __2.0.0__
+    * Bundles all package dialogs into one single dialog
     * Changes all generated names to use the ResourcePersistable prefix/suffix
+    * Adds support for spring-web-initializr '3.0.0'
 * __1.1.0__
     * Adds support for spring-boot-starter-parent from version '1.5.20.RELEASE' up to LATEST
     * Adds support for older IntelliJ IDEA since build '171.4424.54'
