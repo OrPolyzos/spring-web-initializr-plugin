@@ -1,12 +1,12 @@
 <idea-plugin>
-    <id>spring.web.initializr.plugin</id>
-    <name>Swip (Spring Web Initializr)</name>
-    <vendor email="orestes.polyzos@gmail.com" url="https://www.linkedin.com/in/orestes-polyzos/">Orestes Polyzos</vendor>
+  <id>spring.web.initializr.plugin</id>
+  <name>Swip (Spring Web Initializr)</name>
+  <vendor email="orestes.polyzos@gmail.com" url="https://www.linkedin.com/in/orestes-polyzos/">Orestes Polyzos</vendor>
 
-    <idea-version since-build="171.4424.54" until-build="192.*"/>
+  <idea-version since-build="171.4424.54" until-build="193.*"/>
 
-    <description>
-        <![CDATA[
+  <description>
+    <![CDATA[
             <h1>Create a fully functional (Spring Boot) WebApp with just a few clicks</h1>
             <p>Swip will generate all the files required for a functional web application based on your domain classes.</p>
             <p>
@@ -24,11 +24,18 @@
                 Swip is an open-source project. You can get more information at its' <a href="https://github.com/OrPolyzos/spring-web-initializr-plugin">Github Repo</a>.
             </p>
         ]]>
-    </description>
+  </description>
 
-    <change-notes>
-        <![CDATA[
+  <change-notes>
+    <![CDATA[
             <ul>
+                <li>
+                    <strong>1.1.2</strong>
+                    <ul>
+                        <li>Fixes NPE when caret is inside a .java file but outside of a Java Class</li>
+                        <li>Adds support for IntelliJ IDEA until build '193.*'</li>
+                    </ul>
+                </li>
                 <li>
                     <strong>1.1.1</strong>
                     <ul>
@@ -53,20 +60,19 @@
                 </li>
             </ul>
         ]]>
-    </change-notes>
+  </change-notes>
 
-    <depends>com.intellij.modules.lang</depends>
-    <depends>com.intellij.modules.java</depends>
-    <depends>com.intellij.modules.ultimate</depends>
-    <depends>com.intellij.modules.idea</depends>
-    <depends>com.intellij.modules.idea.ultimate</depends>
+  <depends>com.intellij.modules.lang</depends>
+  <depends>com.intellij.modules.java</depends>
+  <depends>com.intellij.modules.ultimate</depends>
+  <depends>com.intellij.modules.idea</depends>
+  <depends>com.intellij.modules.idea.ultimate</depends>
 
-
-    <actions>
-        <action id="action-spring-web-initializr" class="ore.plugins.idea.swip.action.SwipAction"
-                text="Swip" description="Generates everything">
-            <add-to-group group-id="EditorPopupMenu" anchor="first"/>
-        </action>
-    </actions>
+  <actions>
+    <action id="action-spring-web-initializr" class="ore.plugins.idea.swip.action.SwipAction"
+      text="Swip" description="Generates everything">
+      <add-to-group group-id="EditorPopupMenu" anchor="first"/>
+    </action>
+  </actions>
 
 </idea-plugin>
